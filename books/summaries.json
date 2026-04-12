@@ -1,0 +1,259 @@
+{
+  "_default": {
+    "period": "",
+    "bigIdea": "Chapter summary not available for this book.",
+    "keyPoints": [],
+    "keyFigures": [],
+    "keyTerms": []
+  },
+  "monetary-fiscal-history": {
+    "0": {
+      "period": "1961-2021",
+      "bigIdea": "Sixty years of US economic policy reveal recurring patterns of mistakes, ideological swings, and hard-won lessons about managing the world's largest economy.",
+      "keyPoints": [
+        {"icon": "🔄", "title": "History Repeats", "text": "Policymakers repeatedly forget the lessons of the past, leading to cycles of inflation, recession, and financial crisis that could have been mitigated."},
+        {"icon": "⚖️", "title": "Monetary vs Fiscal", "text": "The tension between the Fed's monetary policy and Congress/the President's fiscal policy is the central drama. Sometimes they cooperate, sometimes they clash with costly results."},
+        {"icon": "📐", "title": "Theory Meets Reality", "text": "Academic economic theories (Keynesianism, monetarism, rational expectations, supply-side) profoundly shaped real policy decisions, sometimes for better, sometimes for worse."},
+        {"icon": "🏛️", "title": "Institutions Matter", "text": "The independence of the Federal Reserve from political pressure has been crucial for sound economic management, though that independence is always under threat."}
+      ],
+      "keyFigures": ["Alan S. Blinder", "John F. Kennedy", "Paul Volcker", "Alan Greenspan", "Ben Bernanke"],
+      "keyTerms": ["Monetary Policy", "Fiscal Policy", "Federal Reserve", "Inflation", "Recession"]
+    },
+    "1": {
+      "period": "1961-1963",
+      "bigIdea": "The Kennedy administration brought Keynesian economics from the academy to the White House, launching an ambitious fiscal experiment with a major tax cut to stimulate growth.",
+      "keyPoints": [
+        {"icon": "🎓", "title": "Keynesians Take Power", "text": "JFK's Council of Economic Advisers, led by Walter Heller, introduced Keynesian demand management as official policy for the first time."},
+        {"icon": "✂️", "title": "The Kennedy Tax Cut", "text": "A bold proposal to cut taxes during peacetime to close the 'GDP gap' - revolutionary at the time and a defining moment for fiscal activism."},
+        {"icon": "📊", "title": "The GDP Gap Concept", "text": "Economists identified the economy as running below its potential, arguing that a deliberate deficit could push output toward full employment."},
+        {"icon": "🏦", "title": "Fed Cooperation", "text": "The Federal Reserve under William McChesney Martin largely accommodated the expansionary fiscal policy, keeping monetary conditions supportive."}
+      ],
+      "keyFigures": ["John F. Kennedy", "Walter Heller", "William McChesney Martin", "Lyndon Johnson"],
+      "keyTerms": ["Keynesian Economics", "Tax Cut", "GDP Gap", "Fiscal Stimulus", "Full Employment"]
+    },
+    "2": {
+      "period": "1964-1968",
+      "bigIdea": "Vietnam War spending and Great Society programs without tax increases ignited inflation, prompting a fundamental challenge to Keynesian orthodoxy from Milton Friedman's monetarism.",
+      "keyPoints": [
+        {"icon": "⚔️", "title": "Guns and Butter", "text": "LBJ tried to fund both Vietnam and the Great Society without raising taxes, overheating the economy and sparking inflation."},
+        {"icon": "💵", "title": "Monetarism Rises", "text": "Milton Friedman argued that inflation is always and everywhere a monetary phenomenon, challenging the Keynesian focus on fiscal policy."},
+        {"icon": "📈", "title": "Inflation Ignites", "text": "After years of price stability, inflation began creeping up in the mid-1960s, beginning a problem that would dominate the next 15 years."},
+        {"icon": "🏛️", "title": "The Surtax Delay", "text": "Congress delayed passing LBJ's proposed tax surcharge for over a year, demonstrating the political difficulty of contractionary fiscal policy."}
+      ],
+      "keyFigures": ["Lyndon Johnson", "Milton Friedman", "William McChesney Martin"],
+      "keyTerms": ["Monetarism", "Money Supply", "Vietnam Inflation", "Great Society", "Tax Surcharge"]
+    },
+    "3": {
+      "period": "1968-1971",
+      "bigIdea": "The Phillips Curve - the supposed stable tradeoff between inflation and unemployment - broke down, reshaping macroeconomic theory and policy for decades.",
+      "keyPoints": [
+        {"icon": "📉", "title": "Phillips Curve Collapse", "text": "The empirical relationship between low unemployment and moderate inflation fell apart as both rose simultaneously."},
+        {"icon": "🧠", "title": "Friedman-Phelps Revolution", "text": "Friedman and Phelps independently argued that the long-run Phillips Curve is vertical - you can't permanently buy lower unemployment with higher inflation."},
+        {"icon": "🎯", "title": "Natural Rate Hypothesis", "text": "The concept of a 'natural rate of unemployment' emerged, suggesting a floor below which policy cannot sustainably push unemployment."},
+        {"icon": "💭", "title": "Expectations Enter Economics", "text": "The role of inflation expectations became central to macroeconomics. If people expect inflation, it becomes self-fulfilling."}
+      ],
+      "keyFigures": ["Milton Friedman", "Edmund Phelps", "A.W. Phillips"],
+      "keyTerms": ["Phillips Curve", "Natural Rate", "Inflation Expectations", "NAIRU", "Stagflation"]
+    },
+    "4": {
+      "period": "1969-1974",
+      "bigIdea": "Nixon's pressure on Fed Chair Arthur Burns to ease monetary policy before elections created a textbook case of the political business cycle, with devastating inflationary consequences.",
+      "keyPoints": [
+        {"icon": "🗳️", "title": "Political Business Cycle", "text": "Nixon pressured Fed Chair Burns to keep money loose before the 1972 election, sacrificing long-term price stability for short-term political gain."},
+        {"icon": "🔒", "title": "Wage-Price Controls", "text": "Nixon imposed wage and price controls in August 1971 - a dramatic intervention that temporarily suppressed but ultimately worsened inflation."},
+        {"icon": "💱", "title": "End of Bretton Woods", "text": "Nixon closed the gold window, ending dollar convertibility and the Bretton Woods fixed exchange rate system that had governed international finance since WWII."},
+        {"icon": "🛢️", "title": "OPEC Oil Shock", "text": "The 1973 Arab oil embargo quadrupled oil prices, delivering a massive supply shock that worsened the already building inflation."}
+      ],
+      "keyFigures": ["Richard Nixon", "Arthur Burns", "John Connally"],
+      "keyTerms": ["Price Controls", "Gold Window", "Bretton Woods", "OPEC", "Political Business Cycle"]
+    },
+    "5": {
+      "period": "1974-1977",
+      "bigIdea": "Stagflation - simultaneous high inflation and high unemployment - shattered the prevailing economic framework and left policymakers without a clear roadmap.",
+      "keyPoints": [
+        {"icon": "🌀", "title": "Stagflation Paradox", "text": "The economy suffered both high inflation and deep recession simultaneously - a combination Keynesian theory said was impossible."},
+        {"icon": "🛢️", "title": "Supply Shock Economics", "text": "Economists had to develop new frameworks to understand supply-side shocks like oil price spikes, which were fundamentally different from demand-driven inflation."},
+        {"icon": "😰", "title": "Misery Index", "text": "The 'misery index' (inflation + unemployment) soared, capturing the public's feeling that the economy was broken on every dimension."},
+        {"icon": "🔄", "title": "Stop-Go Policy", "text": "The Fed alternated between fighting inflation (tightening) and fighting unemployment (easing), succeeding at neither and losing credibility."}
+      ],
+      "keyFigures": ["Gerald Ford", "Arthur Burns", "Alan Greenspan"],
+      "keyTerms": ["Stagflation", "Supply Shock", "Misery Index", "Stop-Go Policy", "WIN"]
+    },
+    "6": {
+      "period": "1970s",
+      "bigIdea": "The rational expectations revolution argued that systematic monetary policy cannot fool people, challenging the ability of central banks to fine-tune the economy.",
+      "keyPoints": [
+        {"icon": "🧠", "title": "Rational Expectations", "text": "Robert Lucas and others argued that people form expectations rationally using all available information, so anticipated policy changes have no real effects."},
+        {"icon": "📜", "title": "Policy Ineffectiveness", "text": "The Sargent-Wallace proposition claimed that systematic monetary policy cannot affect real output - only surprise policy moves have real effects."},
+        {"icon": "⚔️", "title": "Freshwater vs Saltwater", "text": "A deep divide opened between 'freshwater' (Chicago, Minnesota) economists favoring rational expectations and 'saltwater' (MIT, Harvard) Keynesians."},
+        {"icon": "🎯", "title": "Rules vs Discretion", "text": "The debate shifted toward whether central banks should follow fixed rules or use discretionary judgment."}
+      ],
+      "keyFigures": ["Robert Lucas", "Thomas Sargent", "Neil Wallace", "Robert Barro"],
+      "keyTerms": ["Rational Expectations", "Policy Ineffectiveness", "Lucas Critique", "Rules vs Discretion"]
+    },
+    "7": {
+      "period": "1977-1983",
+      "bigIdea": "Paul Volcker's Fed deliberately engineered a severe recession to break the back of double-digit inflation - a painful but ultimately successful bet that restored central bank credibility.",
+      "keyPoints": [
+        {"icon": "🦅", "title": "Volcker's Gamble", "text": "Appointed in 1979, Volcker raised interest rates to unprecedented levels (the fed funds rate hit 20%) to crush entrenched inflation expectations."},
+        {"icon": "📉", "title": "Deliberate Recession", "text": "The 1981-82 recession was the deepest since the Great Depression, with unemployment hitting 10.8%. Volcker accepted this cost as necessary."},
+        {"icon": "🎯", "title": "Credibility Restored", "text": "By holding firm despite enormous political pressure and economic pain, Volcker re-established the Fed's anti-inflation credibility for a generation."},
+        {"icon": "💡", "title": "Monetarist Experiment", "text": "The Fed briefly adopted money supply targeting (monetarist approach) but found it operationally unworkable, returning to interest rate targeting."}
+      ],
+      "keyFigures": ["Paul Volcker", "Jimmy Carter", "Ronald Reagan"],
+      "keyTerms": ["Volcker Shock", "Disinflation", "Fed Credibility", "Money Supply Targeting", "Double-Dip Recession"]
+    },
+    "8": {
+      "period": "1981-1984",
+      "bigIdea": "Reagan's massive tax cuts and defense buildup created enormous deficits that clashed head-on with Volcker's tight monetary policy, producing sky-high interest rates and a strong dollar.",
+      "keyPoints": [
+        {"icon": "✂️", "title": "Supply-Side Tax Cuts", "text": "Reagan's 1981 tax cuts were based on supply-side economics, which claimed lower rates would pay for themselves through growth. They didn't."},
+        {"icon": "⚔️", "title": "Monetary-Fiscal Collision", "text": "Loose fiscal policy (huge deficits) combined with tight monetary policy (high rates) is the textbook worst combination - it drove interest rates through the roof."},
+        {"icon": "💪", "title": "Strong Dollar Crisis", "text": "The policy mix attracted foreign capital, pushing the dollar up 50%+ and devastating US exporters and manufacturing."},
+        {"icon": "📊", "title": "Deficits Explode", "text": "The federal deficit tripled to over $200 billion. Reagan turned the US from the world's largest creditor to its largest debtor."}
+      ],
+      "keyFigures": ["Ronald Reagan", "Paul Volcker", "David Stockman", "Arthur Laffer"],
+      "keyTerms": ["Supply-Side Economics", "Laffer Curve", "Twin Deficits", "Crowding Out", "Strong Dollar"]
+    },
+    "9": {
+      "period": "1983-1990",
+      "bigIdea": "After the Volcker recession, the US enjoyed a long expansion, but punctuated by the 1987 stock crash and the savings and loan crisis.",
+      "keyPoints": [
+        {"icon": "📈", "title": "Long Expansion", "text": "The economy grew for 92 consecutive months (1982-1990), then the longest peacetime expansion on record, fueled by the inflation victory."},
+        {"icon": "💥", "title": "Black Monday 1987", "text": "The stock market crashed 22.6% in a single day. Greenspan's rapid liquidity injection prevented economic fallout and built his reputation."},
+        {"icon": "🏦", "title": "S&L Crisis", "text": "Deregulated savings and loans made reckless bets. The resulting bailout cost taxpayers $130+ billion - a warning about financial deregulation."},
+        {"icon": "🎯", "title": "Greenspan Era Begins", "text": "Alan Greenspan replaced Volcker in 1987 and began his long tenure, gradually establishing the 'Greenspan Put.'"}
+      ],
+      "keyFigures": ["Alan Greenspan", "Ronald Reagan", "George H.W. Bush"],
+      "keyTerms": ["Greenspan Put", "Black Monday", "S&L Crisis", "Financial Deregulation", "Soft Landing"]
+    },
+    "10": {
+      "period": "1982-1998",
+      "bigIdea": "Persistent deficits became the central political obsession, effectively killing discretionary fiscal policy as a macroeconomic tool for nearly two decades.",
+      "keyPoints": [
+        {"icon": "🚫", "title": "Fiscal Policy Paralyzed", "text": "Concern over deficits meant Congress could not use spending or tax cuts as counter-cyclical tools, leaving the Fed as the only game in town."},
+        {"icon": "📋", "title": "Gramm-Rudman-Hollings", "text": "Congress passed automatic deficit-reduction rules, but they were routinely gamed, showing the limits of budget process reforms."},
+        {"icon": "📊", "title": "Bush's Tax Reversal", "text": "George H.W. Bush broke his 'read my lips' pledge and raised taxes in 1990, a politically costly but economically responsible decision."},
+        {"icon": "✅", "title": "Clinton Surplus", "text": "The 1993 deficit-reduction package and the 1990s boom eventually produced budget surpluses by 1998 - a remarkable fiscal turnaround."}
+      ],
+      "keyFigures": ["George H.W. Bush", "Bill Clinton", "Robert Rubin", "Phil Gramm"],
+      "keyTerms": ["Budget Deficit", "Gramm-Rudman", "Deficit Reduction", "Budget Surplus", "Pay-As-You-Go"]
+    },
+    "11": {
+      "period": "1993-2000",
+      "bigIdea": "The 1990s saw a rare alignment of good policy, good luck, and technological revolution, producing the longest expansion in US history with declining inflation and budget surpluses.",
+      "keyPoints": [
+        {"icon": "💻", "title": "Tech Revolution", "text": "The internet and IT boom drove a productivity acceleration that allowed faster growth without inflation - the holy grail of economics."},
+        {"icon": "📈", "title": "Goldilocks Economy", "text": "Growth was strong, unemployment fell below 4%, inflation stayed low, and the budget moved into surplus. Everything seemed perfect."},
+        {"icon": "🎯", "title": "Greenspan's Gamble", "text": "Greenspan bet that productivity growth was accelerating, allowing the Fed to hold rates lower than traditional models suggested. He was right."},
+        {"icon": "⚠️", "title": "Dot-Com Bubble", "text": "Stock market speculation reached extreme levels. Greenspan identified 'irrational exuberance' in 1996 but did little to restrain the bubble."}
+      ],
+      "keyFigures": ["Bill Clinton", "Alan Greenspan", "Robert Rubin", "Larry Summers"],
+      "keyTerms": ["Productivity Boom", "Irrational Exuberance", "Dot-Com Bubble", "New Economy", "Budget Surplus"]
+    },
+    "12": {
+      "period": "2001-2007",
+      "bigIdea": "The 2001 recession brought a 'jobless recovery,' while the Fed's low rates and lax regulation inflated twin housing and credit bubbles that would bring the system down.",
+      "keyPoints": [
+        {"icon": "💥", "title": "Dot-Com Bust", "text": "The tech bubble burst in 2000, and 9/11 deepened the downturn. The Fed slashed rates to 1%, the lowest in decades."},
+        {"icon": "😰", "title": "Jobless Recovery", "text": "Unlike previous recoveries, employment was painfully slow to bounce back. The term 'jobless recovery' entered the lexicon."},
+        {"icon": "🏠", "title": "Housing Bubble", "text": "Ultra-low rates and relaxed lending standards fueled an enormous housing bubble. Home prices rose ~70% nationally in just a few years."},
+        {"icon": "🙈", "title": "Regulatory Failure", "text": "Regulators failed to address predatory lending, excessive leverage, and systemic risk buildup."}
+      ],
+      "keyFigures": ["George W. Bush", "Alan Greenspan", "Ben Bernanke"],
+      "keyTerms": ["Jobless Recovery", "Housing Bubble", "Subprime Mortgages", "CDOs", "MBS"]
+    },
+    "13": {
+      "period": "2007-2009",
+      "bigIdea": "The collapse of the housing bubble triggered the worst financial crisis since 1929, bringing the global economy to the brink of a second Great Depression.",
+      "keyPoints": [
+        {"icon": "💥", "title": "Lehman Collapse", "text": "Lehman Brothers' bankruptcy in September 2008 was the pivotal moment, turning a serious crisis into a global panic."},
+        {"icon": "🏦", "title": "TARP Bailouts", "text": "The $700 billion Troubled Asset Relief Program was deeply unpopular but arguably prevented a complete financial meltdown."},
+        {"icon": "📉", "title": "Great Recession", "text": "GDP fell 4.3%, unemployment peaked at 10%, and household wealth dropped by $13 trillion."},
+        {"icon": "⚡", "title": "Emergency Fed Actions", "text": "The Fed cut rates to near zero and deployed unprecedented emergency lending facilities, acting as lender of last resort to the entire financial system."}
+      ],
+      "keyFigures": ["Ben Bernanke", "Henry Paulson", "Timothy Geithner", "George W. Bush"],
+      "keyTerms": ["Lehman Brothers", "TARP", "Too Big to Fail", "Credit Freeze", "Systemic Risk"]
+    },
+    "14": {
+      "period": "2009-2010",
+      "bigIdea": "For the first time in decades, monetary and fiscal policy worked in concert as the Fed launched QE and Obama signed the massive Recovery Act stimulus.",
+      "keyPoints": [
+        {"icon": "🤝", "title": "Policy Coordination", "text": "The Fed's near-zero rates and QE combined with the $800B fiscal stimulus - a rare moment of monetary-fiscal alignment."},
+        {"icon": "💰", "title": "Quantitative Easing", "text": "With rates at zero, the Fed bought trillions in bonds to push long-term rates down and stimulate the economy."},
+        {"icon": "🏗️", "title": "ARRA Stimulus", "text": "Obama's Recovery Act combined tax cuts, infrastructure spending, and aid to states. Economists debate its size but agree it helped."},
+        {"icon": "📜", "title": "Dodd-Frank Reform", "text": "Major financial regulation overhaul aimed to prevent future crises through higher capital requirements and stress tests."}
+      ],
+      "keyFigures": ["Barack Obama", "Ben Bernanke", "Timothy Geithner", "Christina Romer"],
+      "keyTerms": ["Quantitative Easing", "Zero Lower Bound", "ARRA", "Dodd-Frank", "Stress Tests"]
+    },
+    "15": {
+      "period": "2010-2012",
+      "bigIdea": "The Tea Party backlash killed fiscal stimulus prematurely, forcing the Fed to carry the entire burden of supporting a fragile recovery.",
+      "keyPoints": [
+        {"icon": "🫖", "title": "Tea Party Revolt", "text": "Populist anger over bailouts and deficits swept Republicans into Congress in 2010, ending any chance of further fiscal stimulus."},
+        {"icon": "✂️", "title": "Austerity Pivot", "text": "Policy pivoted to deficit reduction far too early, with sequestration and spending cuts dragging on the recovery."},
+        {"icon": "🏦", "title": "Fed Carries the Load", "text": "With fiscal policy turning contractionary, the Fed launched QE2 and QE3, becoming the sole source of economic support."},
+        {"icon": "🌍", "title": "European Crisis Echo", "text": "Europe's sovereign debt crisis provided a cautionary tale about premature fiscal tightening during a fragile recovery."}
+      ],
+      "keyFigures": ["Barack Obama", "Ben Bernanke", "John Boehner", "Paul Ryan"],
+      "keyTerms": ["Tea Party", "Sequestration", "Austerity", "QE2/QE3", "Fiscal Cliff"]
+    },
+    "16": {
+      "period": "2010-2019",
+      "bigIdea": "The 2010s produced the longest expansion in US history at 128 months, but it was frustratingly slow, with persistently low inflation puzzling economists.",
+      "keyPoints": [
+        {"icon": "📈", "title": "Record Expansion", "text": "From June 2009 to February 2020 - 128 months of uninterrupted growth, surpassing the 1990s record, though at a slower pace."},
+        {"icon": "🔍", "title": "Missing Inflation", "text": "Despite falling unemployment, inflation stubbornly stayed below the Fed's 2% target, challenging the Phillips Curve framework yet again."},
+        {"icon": "📊", "title": "Slow but Steady", "text": "GDP growth averaged only about 2.3% - well below historical norms. The phrase 'secular stagnation' entered debate."},
+        {"icon": "🏦", "title": "Gradual Normalization", "text": "The Fed cautiously raised rates starting in 2015 and began shrinking its balance sheet, trying to return to normal monetary policy."}
+      ],
+      "keyFigures": ["Janet Yellen", "Ben Bernanke", "Barack Obama"],
+      "keyTerms": ["Secular Stagnation", "Low Inflation Puzzle", "Forward Guidance", "Balance Sheet Normalization"]
+    },
+    "17": {
+      "period": "2017-2019",
+      "bigIdea": "Trump's tax cuts delivered pro-cyclical fiscal stimulus to an already-healthy economy while his attacks on Fed independence represented a dangerous break from norms.",
+      "keyPoints": [
+        {"icon": "✂️", "title": "TCJA Tax Cuts", "text": "The 2017 Tax Cuts and Jobs Act cut corporate taxes from 35% to 21%, adding ~$1.9 trillion to deficits over a decade."},
+        {"icon": "⚠️", "title": "Pro-Cyclical Stimulus", "text": "Cutting taxes with unemployment already at 4.1% was classic pro-cyclical policy - stimulus when the economy didn't need it."},
+        {"icon": "🏦", "title": "Attacking Fed Independence", "text": "Trump publicly berated Fed Chair Powell for raising rates, the most aggressive presidential attack on Fed independence in modern history."},
+        {"icon": "🌐", "title": "Trade Wars", "text": "Tariffs on China and allies created economic uncertainty, partially offsetting the tax cut stimulus."}
+      ],
+      "keyFigures": ["Donald Trump", "Jerome Powell", "Steven Mnuchin"],
+      "keyTerms": ["TCJA", "Pro-Cyclical Policy", "Fed Independence", "Trade War", "Tariffs"]
+    },
+    "18": {
+      "period": "2020-2021",
+      "bigIdea": "The pandemic triggered the sharpest economic collapse in history, met by the fastest and largest combined monetary-fiscal response ever seen.",
+      "keyPoints": [
+        {"icon": "🦠", "title": "Pandemic Shock", "text": "COVID-19 caused GDP to fall 31% annualized in Q2 2020 and unemployment to spike to 14.7% - the worst since the Great Depression."},
+        {"icon": "💰", "title": "Massive Fiscal Response", "text": "Congress passed ~$5 trillion in relief across multiple bills, including direct payments, enhanced unemployment, and PPP loans."},
+        {"icon": "🏦", "title": "Fed Goes All-In", "text": "The Fed cut rates to zero, launched unlimited QE, and created 13 emergency lending facilities, going far beyond its 2008 playbook."},
+        {"icon": "📈", "title": "V-Shaped Recovery", "text": "The economy rebounded faster than expected, but unevenly - services lagged while goods demand boomed."},
+        {"icon": "🔥", "title": "Inflation Seeds Planted", "text": "Massive stimulus plus supply chain disruptions set the stage for the inflation surge that followed in 2021-2022."}
+      ],
+      "keyFigures": ["Jerome Powell", "Donald Trump", "Joe Biden", "Janet Yellen"],
+      "keyTerms": ["CARES Act", "PPP", "Unlimited QE", "V-Shaped Recovery", "Supply Chain Crisis"]
+    },
+    "19": {
+      "period": "1961-2021",
+      "bigIdea": "Looking across sixty years, the most striking changes are the death of fiscal activism, the Fed's rise to dominance, and the persistent failure to learn from past mistakes.",
+      "keyPoints": [
+        {"icon": "📉", "title": "Fiscal Policy's Decline", "text": "Discretionary counter-cyclical fiscal policy has largely disappeared, killed by partisan gridlock and deficit anxiety."},
+        {"icon": "🏦", "title": "The Fed Ascendant", "text": "The Federal Reserve evolved from a supporting player to the dominant force in macroeconomic management, for better and worse."},
+        {"icon": "🔄", "title": "Lessons Not Learned", "text": "The same mistakes recur: pro-cyclical fiscal policy, bubbles from regulatory neglect, premature austerity, attacks on Fed independence."},
+        {"icon": "⚖️", "title": "Independence Imperative", "text": "Central bank independence from political pressure remains the single most important institutional safeguard for sound economic policy."}
+      ],
+      "keyFigures": ["Paul Volcker", "Alan Greenspan", "Ben Bernanke", "Janet Yellen", "Jerome Powell"],
+      "keyTerms": ["Central Bank Independence", "Counter-Cyclical Policy", "Secular Stagnation", "Financial Stability"]
+    },
+    "20": {
+      "period": "",
+      "bigIdea": "Bibliography and source references.",
+      "keyPoints": [],
+      "keyFigures": [],
+      "keyTerms": []
+    }
+  }
+}

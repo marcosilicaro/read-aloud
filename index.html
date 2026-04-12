@@ -203,23 +203,94 @@
     .badge { position:absolute; top:4px; right:4px; width:8px; height:8px; background:var(--accent); border-radius:50%; display:none; }
     .badge.show { display:block; }
 
-    /* Chapter selector */
-    .chapter-selector {
-      display:flex; align-items:center; gap:6px; padding:8px 20px;
-      background:var(--surface); border-bottom:1px solid rgba(128,128,128,0.06);
-      overflow-x:auto; flex-shrink:0;
-      scrollbar-width:none;
-    }
-    .chapter-selector::-webkit-scrollbar { display:none; }
+    /* ===== Visual Summary View ===== */
+    .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 280px; }
 
-    .chapter-chip {
-      white-space:nowrap; padding:5px 12px; border-radius:16px; border:none;
-      background:var(--surface-2); color:var(--text-muted);
-      font-size:12px; font-family:var(--font-ui); cursor:pointer;
-      transition:all 0.2s; flex-shrink:0;
+    .summary-hero {
+      background: linear-gradient(135deg, var(--accent-soft), rgba(124,108,252,0.05));
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      border-left: 4px solid var(--accent);
     }
-    .chapter-chip:hover { background:var(--surface-hover); color:var(--text); }
-    .chapter-chip.active { background:var(--accent-soft); color:var(--accent); font-weight:500; }
+    .summary-hero-period {
+      font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px;
+      color:var(--accent); margin-bottom:8px;
+    }
+    .summary-hero-idea {
+      font-family:var(--font-body); font-size:18px; line-height:1.5;
+      font-weight:500; color:var(--text);
+    }
+
+    .summary-section-title {
+      font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
+      color:var(--text-muted); margin:28px 0 14px; padding-left:4px;
+    }
+
+    .summary-card {
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:18px;
+      margin-bottom:10px;
+      border:1px solid rgba(128,128,128,0.06);
+      display:flex;
+      gap:14px;
+      transition: all 0.2s;
+    }
+    .summary-card:hover { background:var(--surface-hover); }
+
+    .summary-card-icon {
+      font-size:24px; flex-shrink:0; width:40px; height:40px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--accent-soft); border-radius:10px;
+    }
+
+    .summary-card-body { flex:1; min-width:0; }
+    .summary-card-title { font-size:14px; font-weight:600; margin-bottom:4px; }
+    .summary-card-text { font-size:13px; line-height:1.55; color:var(--text-secondary); }
+
+    .summary-tags {
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+
+    .summary-tag {
+      padding:6px 14px; border-radius:20px;
+      background:var(--surface); border:1px solid rgba(128,128,128,0.1);
+      font-size:12px; color:var(--text-secondary);
+    }
+
+    .summary-figures {
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+
+    .summary-figure {
+      display:flex; align-items:center; gap:6px;
+      padding:6px 12px; border-radius:var(--radius-sm);
+      background:var(--surface); border:1px solid rgba(128,128,128,0.06);
+      font-size:12px; color:var(--text-secondary);
+    }
+
+    .summary-figure-avatar {
+      width:24px; height:24px; border-radius:50%;
+      background:var(--accent-soft); display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:600; color:var(--accent);
+    }
+
+    .summary-nav {
+      display:flex; gap:8px; margin-top:24px;
+    }
+
+    .summary-nav-btn {
+      flex:1; padding:12px; border-radius:var(--radius-sm); border:none;
+      background:var(--surface); color:var(--text-secondary);
+      font-size:13px; font-family:var(--font-ui); cursor:pointer;
+      transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .summary-nav-btn:hover { background:var(--surface-hover); color:var(--text); }
+    .summary-nav-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; }
+
+    /* View toggle button highlight */
+    .icon-btn.view-toggle.summary-active { color:var(--accent); background:var(--accent-soft); }
 
     /* Reader area */
     .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; }
@@ -383,20 +454,6 @@
       font-family:var(--font-ui); cursor:pointer; width:100%; outline:none;
     }
 
-    /* Search */
-    .search-input {
-      width:100%; padding:10px 14px; border-radius:var(--radius-sm);
-      border:1px solid rgba(128,128,128,0.15); background:var(--surface-2);
-      color:var(--text); font-size:14px; font-family:var(--font-ui); outline:none; transition:border-color 0.2s;
-    }
-    .search-input:focus { border-color:var(--accent); }
-    .search-input::placeholder { color:var(--text-muted); }
-    .search-results { margin-top:12px; }
-    .search-result { padding:8px 12px; border-radius:var(--radius-sm); cursor:pointer; transition:background 0.2s; font-size:13px; margin-bottom:4px; }
-    .search-result:hover { background:var(--surface-hover); }
-    .search-result mark { background:var(--accent-soft); color:var(--accent); border-radius:2px; padding:0 2px; }
-    .search-result .sr-speaker { font-size:11px; color:var(--text-muted); font-weight:500; }
-
     /* Toast */
     .toast {
       position:fixed; bottom:260px; left:50%; transform:translateX(-50%) translateY(12px);
@@ -480,8 +537,8 @@
         <h1 id="readerTitle">-</h1>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="searchBtn" title="Search (/)">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <button class="icon-btn view-toggle" id="viewToggleBtn" title="Switch to visual summary">
+          <svg viewBox="0 0 24 24" id="viewToggleIcon"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         </button>
         <button class="icon-btn" id="tocBtn" title="Chapters">
           <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
@@ -495,8 +552,6 @@
         </button>
       </div>
     </div>
-
-    <div class="chapter-selector" id="chapterSelector"></div>
 
     <div class="reader" id="reader">
       <div class="reader-content" id="readerContent"></div>
@@ -524,7 +579,7 @@
         <button class="meta-chip" id="sleepChip" title="Sleep timer"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><span id="sleepLabel">Sleep</span></button>
         <button class="meta-chip" id="bookmarkChip" title="Bookmark (B)"><svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Mark</span></button>
       </div>
-      <div class="kb-hint"><kbd>Space</kbd> play <kbd>&larr;</kbd><kbd>&rarr;</kbd> nav <kbd>B</kbd> mark <kbd>&uarr;</kbd><kbd>&darr;</kbd> speed <kbd>/</kbd> search <kbd>[</kbd><kbd>]</kbd> chapter</div>
+      <div class="kb-hint"><kbd>Space</kbd> play <kbd>&larr;</kbd><kbd>&rarr;</kbd> nav <kbd>B</kbd> mark <kbd>&uarr;</kbd><kbd>&darr;</kbd> speed <kbd>V</kbd> summary <kbd>[</kbd><kbd>]</kbd> chapter</div>
     </div>
   </div>
 
@@ -552,10 +607,7 @@
     </div>
   </div>
 
-  <div class="panel panel-top" id="searchPanel">
-    <div class="panel-header"><h3>Search</h3><button class="icon-btn" id="searchClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <div class="panel-body"><input class="search-input" id="searchInput" placeholder="Search..." autocomplete="off"><div class="search-results" id="searchResults"></div></div>
-  </div>
+  <!-- Search panel removed - replaced by visual summary toggle -->
 
   <!-- Confirm dialog -->
   <div class="confirm-overlay" id="confirmOverlay">
@@ -597,6 +649,8 @@
     voiceURI: null,
     voices: [],
     view: 'library',   // 'library' | 'reader'
+    readerMode: 'text', // 'text' | 'summary'
+    summaries: null,    // loaded summaries data
   };
 
   const $ = id => document.getElementById(id);
@@ -813,25 +867,136 @@
 
     $('bmBadge').classList.toggle('show', S.bookmarks.size > 0);
 
-    renderChapterSelector();
+    // Reset to text mode when opening a book
+    S.readerMode = 'text';
+    $('viewToggleBtn').classList.remove('summary-active');
+    $('viewToggleIcon').innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
+    $('controlsWrapper').style.display = '';
+
+    await loadSummaries();
     renderChapter();
   }
 
-  // ========== Chapters ==========
-  function renderChapterSelector() {
-    if (!S.book || !S.book.chapters) return;
-    const sel = $('chapterSelector');
-    sel.innerHTML = S.book.chapters.map((ch, i) =>
-      `<button class="chapter-chip ${i === S.chapter ? 'active' : ''}" data-ch="${i}">${esc(ch.title)}</button>`
-    ).join('');
-    sel.querySelectorAll('.chapter-chip').forEach(chip => {
-      chip.addEventListener('click', () => switchChapter(parseInt(chip.dataset.ch)));
-    });
-    // Scroll active into view
-    const active = sel.querySelector('.active');
-    if (active) active.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  // ========== Summaries ==========
+  async function loadSummaries() {
+    if (S.summaries) return;
+    try {
+      const res = await fetch('books/summaries.json');
+      S.summaries = await res.json();
+    } catch(e) { S.summaries = {}; }
   }
 
+  function getSummary(bookId, chapterIdx) {
+    if (!S.summaries) return null;
+    const bookSummaries = S.summaries[bookId];
+    if (bookSummaries && bookSummaries[String(chapterIdx)]) return bookSummaries[String(chapterIdx)];
+    return S.summaries._default || null;
+  }
+
+  function renderSummary() {
+    const rc = $('readerContent');
+    const sum = getSummary(S.book?.id, S.chapter);
+    const ch = S.book?.chapters?.[S.chapter];
+
+    if (!sum || !ch) {
+      rc.innerHTML = '<p style="color:var(--text-muted);padding:40px;text-align:center">No summary available for this chapter.</p>';
+      return;
+    }
+
+    let html = '<div class="summary-view">';
+
+    // Hero: Big Idea
+    html += `<div class="summary-hero">
+      ${sum.period ? `<div class="summary-hero-period">${esc(ch.title)} &middot; ${esc(sum.period)}</div>` : `<div class="summary-hero-period">${esc(ch.title)}</div>`}
+      <div class="summary-hero-idea">${esc(sum.bigIdea)}</div>
+    </div>`;
+
+    // Key Points
+    if (sum.keyPoints.length) {
+      html += '<div class="summary-section-title">Key Takeaways</div>';
+      sum.keyPoints.forEach(kp => {
+        html += `<div class="summary-card">
+          <div class="summary-card-icon">${kp.icon}</div>
+          <div class="summary-card-body">
+            <div class="summary-card-title">${esc(kp.title)}</div>
+            <div class="summary-card-text">${esc(kp.text)}</div>
+          </div>
+        </div>`;
+      });
+    }
+
+    // Key Figures
+    if (sum.keyFigures.length) {
+      html += '<div class="summary-section-title">Key Figures</div><div class="summary-figures">';
+      sum.keyFigures.forEach(name => {
+        const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+        html += `<div class="summary-figure">
+          <div class="summary-figure-avatar">${initials}</div>
+          <span>${esc(name)}</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+
+    // Key Terms
+    if (sum.keyTerms.length) {
+      html += '<div class="summary-section-title">Key Concepts</div><div class="summary-tags">';
+      sum.keyTerms.forEach(t => { html += `<div class="summary-tag">${esc(t)}</div>`; });
+      html += '</div>';
+    }
+
+    // Navigation
+    const hasPrev = S.chapter > 0;
+    const hasNext = S.book && S.chapter < S.book.chapters.length - 1;
+    html += '<div class="summary-nav">';
+    if (hasPrev) {
+      html += `<button class="summary-nav-btn" data-dir="prev">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Prev Chapter
+      </button>`;
+    }
+    if (hasNext) {
+      html += `<button class="summary-nav-btn" data-dir="next">
+        Next Chapter
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>`;
+    }
+    html += '</div></div>';
+
+    rc.innerHTML = html;
+    rc.querySelectorAll('.summary-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchChapter(S.chapter + (btn.dataset.dir === 'prev' ? -1 : 1));
+      });
+    });
+
+    // Scroll to top
+    $('reader').scrollTop = 0;
+  }
+
+  function toggleReaderMode() {
+    S.readerMode = S.readerMode === 'text' ? 'summary' : 'text';
+    const btn = $('viewToggleBtn');
+    const icon = $('viewToggleIcon');
+
+    if (S.readerMode === 'summary') {
+      btn.classList.add('summary-active');
+      // Switch icon to text lines
+      icon.innerHTML = '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>';
+      btn.title = 'Switch to text view';
+      renderSummary();
+      $('controlsWrapper').style.display = 'none';
+    } else {
+      btn.classList.remove('summary-active');
+      // Switch icon to grid
+      icon.innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
+      btn.title = 'Switch to visual summary';
+      renderChapter();
+      $('controlsWrapper').style.display = '';
+    }
+  }
+
+  // ========== Chapters ==========
   function switchChapter(idx) {
     if (!S.book) return;
     idx = Math.max(0, Math.min(idx, S.book.chapters.length - 1));
@@ -840,9 +1005,12 @@
     S.cur = 0;
     S.curSentence = 0;
     if (S.playing) { stopSpeaking(); }
-    renderChapterSelector();
-    renderChapter();
-    if (S.playing) speakCurrent();
+    if (S.readerMode === 'summary') {
+      renderSummary();
+    } else {
+      renderChapter();
+    }
+    if (S.playing && S.readerMode === 'text') speakCurrent();
   }
 
   function currentSegments() {
@@ -1074,34 +1242,9 @@
     });
   }
 
-  // ========== Search ==========
-  let searchDebounce;
-  $('searchInput').addEventListener('input',e=>{clearTimeout(searchDebounce);searchDebounce=setTimeout(()=>doSearch(e.target.value),200);});
-  function doSearch(q) {
-    const res=$('searchResults');
-    if(!q.trim()||!S.book){res.innerHTML='';return;}
-    const lower=q.toLowerCase(); const matches=[];
-    S.book.chapters.forEach((ch,ci)=>{
-      (ch.segments||[]).forEach((seg,si)=>{
-        const idx=seg.text.toLowerCase().indexOf(lower);
-        if(idx!==-1) matches.push({ci,si,seg,ch,idx});
-      });
-    });
-    if(!matches.length){res.innerHTML='<p style="color:var(--text-muted);font-size:13px;padding:8px">No results</p>';return;}
-    res.innerHTML='';
-    matches.slice(0,30).forEach(({ci,si,seg,ch,idx})=>{
-      const div=document.createElement('div'); div.className='search-result';
-      const s=Math.max(0,idx-30),e=Math.min(seg.text.length,idx+q.length+30);
-      const snippet=(s>0?'...':'')+esc(seg.text.substring(s,idx))+'<mark>'+esc(seg.text.substring(idx,idx+q.length))+'</mark>'+esc(seg.text.substring(idx+q.length,e))+(e<seg.text.length?'...':'');
-      div.innerHTML=`<div class="sr-speaker">${esc(ch.title)}</div><div>${snippet}</div>`;
-      div.addEventListener('click',()=>{if(ci!==S.chapter)switchChapter(ci);goTo(si);closeAllPanels();});
-      res.appendChild(div);
-    });
-  }
-
   // ========== Panels ==========
   function openPanel(id){closeAllPanels();$(id).classList.add('show');$('panelOverlay').classList.add('show');}
-  function closeAllPanels(){['tocPanel','bmPanel','settingsPanel','searchPanel'].forEach(id=>$(id).classList.remove('show'));$('panelOverlay').classList.remove('show');}
+  function closeAllPanels(){['tocPanel','bmPanel','settingsPanel'].forEach(id=>$(id).classList.remove('show'));$('panelOverlay').classList.remove('show');}
   $('panelOverlay').addEventListener('click',closeAllPanels);
   $('tocBtn').addEventListener('click',()=>{renderTOC();openPanel('tocPanel');});
   $('tocClose').addEventListener('click',closeAllPanels);
@@ -1110,8 +1253,7 @@
   $('readerSettingsBtn').addEventListener('click',()=>openPanel('settingsPanel'));
   $('libSettingsBtn').addEventListener('click',()=>openPanel('settingsPanel'));
   $('settingsClose').addEventListener('click',closeAllPanels);
-  $('searchBtn').addEventListener('click',()=>{openPanel('searchPanel');setTimeout(()=>$('searchInput').focus(),100);});
-  $('searchClose').addEventListener('click',closeAllPanels);
+  $('viewToggleBtn').addEventListener('click', toggleReaderMode);
 
   // ========== Upload / Import ==========
   $('fileInput').addEventListener('change',()=>{if($('fileInput').files.length)handleUpload($('fileInput').files[0]);$('fileInput').value='';});
@@ -1242,7 +1384,7 @@
       case 'BracketRight':e.preventDefault();switchChapter(S.chapter+1);break;
       case 'Home':goTo(0);break;
       case 'End':goTo(currentSegments().length-1);break;
-      case 'Slash':e.preventDefault();openPanel('searchPanel');setTimeout(()=>$('searchInput').focus(),100);break;
+      case 'KeyV':toggleReaderMode();break;
       case 'Escape':if(S.view==='reader'){closeAllPanels();}break;
     }
   });
