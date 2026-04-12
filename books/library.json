@@ -14,5 +14,13 @@
     "chapters": 1,
     "segments": 75,
     "file": "books/james-call-transcript.json"
+  },
+  {
+    "id": "history-ancient-world",
+    "title": "The History of the Ancient World: From the Earliest Accounts to the Fall of Rome",
+    "author": "Susan Wise Bauer",
+    "chapters": 91,
+    "segments": 4322,
+    "file": "books/history-ancient-world.json"
   }
 ]
