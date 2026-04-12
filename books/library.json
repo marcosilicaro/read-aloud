@@ -1,0 +1,18 @@
+[
+  {
+    "id": "monetary-fiscal-history",
+    "title": "A Monetary and Fiscal History of the United States, 1961-2021",
+    "author": "Alan S. Blinder",
+    "chapters": 21,
+    "segments": 1579,
+    "file": "books/monetary-fiscal-history.json"
+  },
+  {
+    "id": "james-call-transcript",
+    "title": "Call with James - Lease Review & Deal Analysis",
+    "author": "Marco & James",
+    "chapters": 1,
+    "segments": 75,
+    "file": "books/james-call-transcript.json"
+  }
+]

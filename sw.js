@@ -1,9 +1,9 @@
-const CACHE_NAME = 'read-aloud-v1';
+const CACHE_NAME = 'read-aloud-v2';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/transcript.json',
+  '/books/library.json',
 ];
 
 self.addEventListener('install', (e) => {
