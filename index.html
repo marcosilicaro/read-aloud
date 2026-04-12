@@ -385,6 +385,49 @@
     }
     .summary-generating .spinner { width:20px; height:20px; border-width:2px; }
 
+    /* ===== Instructions editor ===== */
+    .instructions-textarea {
+      width:100%; min-height:180px; padding:12px 14px; border-radius:var(--radius-sm);
+      border:1px solid rgba(128,128,128,0.15); background:var(--surface-2);
+      color:var(--text); font-size:13px; font-family:var(--font-ui);
+      line-height:1.7; outline:none; resize:vertical; transition:border-color 0.2s;
+    }
+    .instructions-textarea:focus { border-color:var(--accent); }
+    .instructions-textarea::placeholder { color:var(--text-muted); }
+
+    .instructions-hint {
+      font-size:11px; color:var(--text-muted); margin-top:6px; line-height:1.5;
+    }
+
+    .process-all-btn {
+      width:100%; padding:12px; border-radius:var(--radius-sm); border:none;
+      background:var(--accent); color:white; font-size:13px; font-weight:500;
+      font-family:var(--font-ui); cursor:pointer; transition:all 0.2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-top:12px;
+    }
+    .process-all-btn:hover { box-shadow:0 4px 16px var(--accent-glow); }
+    .process-all-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .process-all-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; }
+
+    .process-progress {
+      margin-top:10px; display:none;
+    }
+    .process-progress.show { display:block; }
+    .process-progress-text { font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+    .process-progress-bar {
+      width:100%; height:6px; background:var(--surface-2); border-radius:3px; overflow:hidden;
+    }
+    .process-progress-fill {
+      height:100%; background:var(--accent); border-radius:3px; transition:width 0.3s;
+    }
+    .process-progress-log {
+      margin-top:8px; max-height:120px; overflow-y:auto;
+      font-size:11px; color:var(--text-muted); line-height:1.6;
+    }
+    .process-progress-log .log-ok { color:#3ecfb0; }
+    .process-progress-log .log-err { color:var(--danger); }
+
     /* Reader area */
     .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; }
     .reader-content { max-width:680px; margin:0 auto; padding:32px 24px 280px; }
@@ -689,7 +732,7 @@
     <div class="panel-body" id="bmBody"></div>
   </div>
 
-  <div class="panel panel-right" id="settingsPanel">
+  <div class="panel panel-right" id="settingsPanel" style="width:380px">
     <div class="panel-header"><h3>Settings</h3><button class="icon-btn" id="settingsClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="panel-body">
       <div class="setting-row"><span class="setting-label">Theme</span><div class="setting-control"><button class="theme-btn active" data-t="dark"></button><button class="theme-btn" data-t="light"></button><button class="theme-btn" data-t="sepia"></button></div></div>
@@ -697,10 +740,31 @@
       <div class="setting-row"><span class="setting-label">Voice</span><div class="setting-control" style="flex:1;margin-left:12px"><select class="voice-select" id="voiceSelect"></select></div></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Speed</span><div class="speed-picker" id="speedPicker"></div></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Sleep Timer</span><div class="sleep-display" id="sleepPicker"></div></div>
-      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <span class="setting-label">OpenAI API Key (for AI summaries)</span>
-        <input class="api-key-input" id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off">
-        <div class="api-key-status"><div class="api-key-dot unset" id="apiKeyDot"></div><span id="apiKeyStatus">Not set</span></div>
+
+      <div style="border-top:1px solid rgba(128,128,128,0.1);margin:16px -16px 0;padding:16px 16px 0">
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+          <span class="setting-label" style="font-weight:600;font-size:14px">AI Summary Settings</span>
+        </div>
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+          <span class="setting-label">OpenAI API Key</span>
+          <input class="api-key-input" id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off">
+          <div class="api-key-status"><div class="api-key-dot unset" id="apiKeyDot"></div><span id="apiKeyStatus">Not set</span></div>
+        </div>
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+          <span class="setting-label">Summary Instructions</span>
+          <div class="instructions-hint">Each line becomes a section in the visual summary. Format: <b>Section Name: instructions for the AI</b></div>
+          <textarea class="instructions-textarea" id="instructionsInput" placeholder="Loading..."></textarea>
+          <div class="instructions-hint">Modify these to change what the AI generates. Changes are saved automatically.</div>
+        </div>
+        <button class="process-all-btn" id="processAllBtn">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Generate All Chapter Summaries
+        </button>
+        <div class="process-progress" id="processProgress">
+          <div class="process-progress-text" id="processProgressText">Processing...</div>
+          <div class="process-progress-bar"><div class="process-progress-fill" id="processProgressFill" style="width:0%"></div></div>
+          <div class="process-progress-log" id="processLog"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -983,10 +1047,10 @@
     $('viewToggleIcon').innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
     $('controlsWrapper').style.display = '';
     $('chatBar').classList.remove('show');
-    S.aiSummary = null;
     S.chatHistory = [];
 
     await loadSummaries();
+    S.aiSummary = loadAISummary(S.chapter);
     renderChapter();
   }
 
@@ -1006,42 +1070,76 @@
     return S.summaries._default || null;
   }
 
-  // ========== Summary rendering ==========
-  function summaryCardsHTML(sum, ch) {
+  // ========== Instructions template ==========
+  const DEFAULT_INSTRUCTIONS = `Big Idea: Summarize the central thesis of the chapter in one sentence
+Key Takeaways: 3-5 main arguments or events, each with an emoji icon, a short title, and a 2-3 sentence explanation
+Key Figures: List the important historical or notable people discussed in the chapter
+Key Concepts: Important terms, ideas, or theories central to the chapter
+Civilizations & Regions: List civilizations, nations, or regions discussed and any relevant context
+Timeline: Key dates and events in chronological order`;
+
+  function getInstructions() {
+    return load('instructions') || DEFAULT_INSTRUCTIONS;
+  }
+
+  function parseInstructions(text) {
+    return text.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+      const idx = line.indexOf(':');
+      if (idx === -1) return { title: line, instruction: line };
+      return { title: line.substring(0, idx).trim(), instruction: line.substring(idx + 1).trim() };
+    });
+  }
+
+  // ========== Summary rendering (dynamic sections) ==========
+  function renderSectionHTML(section) {
+    // section = { title, content } where content can be string, array of cards, or array of strings
     let html = '';
 
-    // Hero
-    html += `<div class="summary-hero">
-      ${sum.period ? `<div class="summary-hero-period">${esc(ch.title)} &middot; ${esc(sum.period)}</div>` : `<div class="summary-hero-period">${esc(ch.title)}</div>`}
-      <div class="summary-hero-idea">${esc(sum.bigIdea)}</div>
-    </div>`;
+    if (!section.content && !section.items) return '';
 
-    if (sum.keyPoints && sum.keyPoints.length) {
-      html += '<div class="summary-section-title">Key Takeaways</div>';
-      sum.keyPoints.forEach(kp => {
+    // String content -> hero or text block
+    if (typeof section.content === 'string' && section.content) {
+      if (section._isFirst) {
+        html += `<div class="summary-hero">
+          <div class="summary-hero-period">${esc(section._chapterTitle || '')}</div>
+          <div class="summary-hero-idea">${esc(section.content)}</div>
+        </div>`;
+      } else {
+        html += `<div class="summary-section-title">${esc(section.title)}</div>`;
+        html += `<div class="summary-card"><div class="summary-card-body"><div class="summary-card-text">${esc(section.content)}</div></div></div>`;
+      }
+    }
+
+    // Array of card objects [{icon, title, text}]
+    if (Array.isArray(section.items) && section.items.length && typeof section.items[0] === 'object' && section.items[0].title) {
+      html += `<div class="summary-section-title">${esc(section.title)}</div>`;
+      section.items.forEach(item => {
         html += `<div class="summary-card">
-          <div class="summary-card-icon">${kp.icon}</div>
+          ${item.icon ? `<div class="summary-card-icon">${item.icon}</div>` : ''}
           <div class="summary-card-body">
-            <div class="summary-card-title">${esc(kp.title)}</div>
-            <div class="summary-card-text">${esc(kp.text)}</div>
+            <div class="summary-card-title">${esc(item.title)}</div>
+            ${item.text ? `<div class="summary-card-text">${esc(item.text)}</div>` : ''}
           </div>
         </div>`;
       });
     }
 
-    if (sum.keyFigures && sum.keyFigures.length) {
-      html += '<div class="summary-section-title">Key Figures</div><div class="summary-figures">';
-      sum.keyFigures.forEach(name => {
-        const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-        html += `<div class="summary-figure"><div class="summary-figure-avatar">${initials}</div><span>${esc(name)}</span></div>`;
-      });
-      html += '</div>';
-    }
-
-    if (sum.keyTerms && sum.keyTerms.length) {
-      html += '<div class="summary-section-title">Key Concepts</div><div class="summary-tags">';
-      sum.keyTerms.forEach(t => { html += `<div class="summary-tag">${esc(t)}</div>`; });
-      html += '</div>';
+    // Array of strings -> tags or figures
+    if (Array.isArray(section.items) && section.items.length && typeof section.items[0] === 'string') {
+      html += `<div class="summary-section-title">${esc(section.title)}</div>`;
+      const looksLikePeople = section.items.every(s => s.split(' ').length >= 2 && s.length < 40);
+      if (looksLikePeople) {
+        html += '<div class="summary-figures">';
+        section.items.forEach(name => {
+          const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          html += `<div class="summary-figure"><div class="summary-figure-avatar">${initials}</div><span>${esc(name)}</span></div>`;
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="summary-tags">';
+        section.items.forEach(t => { html += `<div class="summary-tag">${esc(t)}</div>`; });
+        html += '</div>';
+      }
     }
 
     return html;
@@ -1051,9 +1149,6 @@
     const rc = $('readerContent');
     const ch = S.book?.chapters?.[S.chapter];
 
-    // Use AI summary if available, else fall back to pre-built
-    const sum = S.aiSummary || getSummary(S.book?.id, S.chapter);
-
     if (!ch) {
       rc.innerHTML = '<p style="color:var(--text-muted);padding:40px;text-align:center">No chapter selected.</p>';
       return;
@@ -1061,28 +1156,43 @@
 
     let html = '<div class="summary-view">';
 
-    if (sum) {
-      html += summaryCardsHTML(sum, ch);
+    // Use AI-generated sections if available
+    const aiSections = S.aiSummary;
+
+    if (aiSections && Array.isArray(aiSections) && aiSections.length) {
+      aiSections.forEach((sec, i) => {
+        sec._isFirst = (i === 0);
+        sec._chapterTitle = ch.title;
+        html += renderSectionHTML(sec);
+      });
     } else {
-      html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
-        <div class="summary-hero-idea" style="color:var(--text-muted)">No pre-built summary. Use the chat below to generate one with AI.</div></div>`;
+      // Fall back to pre-built summary (old format)
+      const sum = getSummary(S.book?.id, S.chapter);
+      if (sum && sum.bigIdea) {
+        // Convert old format to sections for rendering
+        const fakeSections = [
+          { title: 'Big Idea', content: sum.bigIdea, _isFirst: true, _chapterTitle: (sum.period ? ch.title + ' \u00B7 ' + sum.period : ch.title) }
+        ];
+        if (sum.keyPoints?.length) fakeSections.push({ title: 'Key Takeaways', items: sum.keyPoints });
+        if (sum.keyFigures?.length) fakeSections.push({ title: 'Key Figures', items: sum.keyFigures });
+        if (sum.keyTerms?.length) fakeSections.push({ title: 'Key Concepts', items: sum.keyTerms });
+        fakeSections.forEach(sec => { html += renderSectionHTML(sec); });
+      } else {
+        html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
+          <div class="summary-hero-idea" style="color:var(--text-muted)">No summary yet. Use the chat below or go to Settings to generate all summaries with AI.</div></div>`;
+      }
     }
 
     // Chat history
     if (S.chatHistory.length) {
-      html += '<div class="summary-section-title">Conversation</div>';
-      html += '<div class="chat-history">';
+      html += '<div class="summary-section-title">Conversation</div><div class="chat-history">';
       S.chatHistory.forEach(msg => {
-        if (msg.role === 'user') {
-          html += `<div class="chat-msg user">${esc(msg.content)}</div>`;
-        } else if (msg.role === 'assistant' && msg._display) {
-          html += `<div class="chat-msg ai">${esc(msg._display)}</div>`;
-        }
+        if (msg.role === 'user') html += `<div class="chat-msg user">${esc(msg.content)}</div>`;
+        else if (msg.role === 'assistant' && msg._display) html += `<div class="chat-msg ai">${esc(msg._display)}</div>`;
       });
       html += '</div>';
     }
 
-    // Loading indicator
     if (S.chatBusy) {
       html += '<div class="chat-history"><div class="chat-msg ai"><div class="chat-thinking"><span></span><span></span><span></span></div></div></div>';
     }
@@ -1100,133 +1210,190 @@
       btn.addEventListener('click', () => switchChapter(S.chapter + (btn.dataset.dir === 'prev' ? -1 : 1)));
     });
 
-    // Scroll to bottom if there's chat, else to top
-    if (S.chatHistory.length || S.chatBusy) {
-      $('reader').scrollTop = $('reader').scrollHeight;
-    } else {
-      $('reader').scrollTop = 0;
-    }
+    if (S.chatHistory.length || S.chatBusy) $('reader').scrollTop = $('reader').scrollHeight;
+    else $('reader').scrollTop = 0;
   }
 
   // ========== OpenAI integration ==========
-  function getChapterText() {
-    const ch = S.book?.chapters?.[S.chapter];
+  function getChapterTextForIdx(chIdx) {
+    const ch = S.book?.chapters?.[chIdx];
     if (!ch) return '';
-    // Send up to ~6000 chars of chapter text to stay within token limits
     const fullText = ch.segments.map(s => s.text).join('\n');
     return fullText.length > 6000 ? fullText.substring(0, 6000) + '...' : fullText;
   }
 
-  const SUMMARY_SYSTEM_PROMPT = `You are a reading assistant that creates visual chapter summaries. Given chapter text and user instructions, generate a structured JSON summary.
+  function getChapterText() { return getChapterTextForIdx(S.chapter); }
 
-ALWAYS respond with ONLY valid JSON in this exact format:
-{
-  "period": "time period covered (or empty string)",
-  "bigIdea": "One-sentence central thesis of the chapter",
-  "keyPoints": [
-    {"icon": "emoji", "title": "Short title", "text": "2-3 sentence explanation"}
-  ],
-  "keyFigures": ["Person 1", "Person 2"],
-  "keyTerms": ["Term 1", "Term 2"]
-}
+  function buildSystemPrompt() {
+    const sections = parseInstructions(getInstructions());
+    const sectionDefs = sections.map((s, i) => {
+      if (i === 0) return `{"title": "${s.title}", "content": "string - ${s.instruction}"}`;
+      return `{"title": "${s.title}", "items": [... or "content": "string"] - ${s.instruction}}`;
+    }).join(',\n    ');
 
-Rules:
-- 3-6 key points, each with a relevant emoji icon
-- Tailor the summary to what the user asks for (focus area, complexity level, perspective, etc.)
-- If user asks to "focus on X", restructure all fields around that angle
-- Keep keyPoints text concise but substantive (2-3 sentences each)
-- Use accurate, relevant emoji icons for each key point
-- Return ONLY the JSON object, no markdown, no explanation`;
+    return `You are a reading assistant that creates visual chapter summaries. Given chapter text, generate a structured JSON summary as an array of sections.
 
-  async function sendChatMessage(userMsg) {
-    if (!S.apiKey) {
-      showToast('Set your OpenAI API key in Settings');
-      return;
+ALWAYS respond with ONLY valid JSON: an array of section objects.
+Format:
+[
+    ${sectionDefs}
+]
+
+Rules for each section:
+- The first section should have a "content" field (string) with a one-sentence summary
+- For sections listing people, use "items" as an array of strings: ["Person 1", "Person 2"]
+- For sections listing concepts/terms/tags, use "items" as an array of strings: ["Term 1", "Term 2"]
+- For sections with detailed points, use "items" as an array of objects: [{"icon": "emoji", "title": "Short title", "text": "2-3 sentence explanation"}]
+- For sections with narrative/paragraph content, use "content" as a string
+- Choose the format that best fits each section's instruction
+- Use accurate, relevant emoji icons where appropriate
+- Return ONLY the JSON array, no markdown, no explanation`;
+  }
+
+  async function callOpenAI(messages) {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.apiKey}` },
+      body: JSON.stringify({ model: 'gpt-4o-mini', messages, temperature: 0.7, max_tokens: 2000 }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${res.status}`);
     }
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    const cleaned = content.replace(/```json?\n?/g, '').replace(/```\n?/g, '').trim();
+    return JSON.parse(cleaned);
+  }
+
+  async function generateSummaryForChapter(chIdx) {
+    const chText = getChapterTextForIdx(chIdx);
+    const chTitle = S.book?.chapters?.[chIdx]?.title || 'Chapter ' + (chIdx + 1);
+    const messages = [
+      { role: 'system', content: buildSystemPrompt() },
+      { role: 'user', content: `Chapter: "${chTitle}"\n\n${chText}` }
+    ];
+    return await callOpenAI(messages);
+  }
+
+  // Chat message (reshapes current chapter)
+  async function sendChatMessage(userMsg) {
+    if (!S.apiKey) { showToast('Set your OpenAI API key in Settings'); return; }
     if (S.chatBusy) return;
 
     S.chatBusy = true;
     S.chatHistory.push({ role: 'user', content: userMsg });
     renderSummary();
 
-    // Build messages
     const messages = [
-      { role: 'system', content: SUMMARY_SYSTEM_PROMPT },
-      { role: 'user', content: `Here is the chapter text:\n\n${getChapterText()}` }
+      { role: 'system', content: buildSystemPrompt() },
+      { role: 'user', content: `Chapter: "${S.book?.chapters?.[S.chapter]?.title}"\n\n${getChapterText()}` }
     ];
 
-    // Add conversation history (only user messages and summary-request context)
+    // Include current summary context
     const currentSum = S.aiSummary || getSummary(S.book?.id, S.chapter);
-    if (currentSum && S.chatHistory.length <= 1) {
-      messages.push({ role: 'user', content: `The current summary is:\n${JSON.stringify(currentSum)}\n\nPlease reshape this summary based on my request: ${userMsg}` });
-    } else {
-      // For follow-up messages, include the conversation
-      S.chatHistory.forEach(msg => {
-        if (msg.role === 'user') {
-          messages.push({ role: 'user', content: msg.content });
-        } else if (msg.role === 'assistant') {
-          messages.push({ role: 'assistant', content: msg.content });
-        }
-      });
+    if (currentSum) {
+      messages.push({ role: 'assistant', content: JSON.stringify(Array.isArray(currentSum) ? currentSum : [currentSum]) });
     }
+    messages.push({ role: 'user', content: `Reshape the summary based on this request: ${userMsg}` });
 
     try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${S.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 1500,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `API error ${res.status}`);
-      }
-
-      const data = await res.json();
-      const content = data.choices?.[0]?.message?.content || '';
-
-      // Parse the JSON response
-      let parsed;
-      try {
-        // Strip markdown code fences if present
-        const cleaned = content.replace(/```json?\n?/g, '').replace(/```\n?/g, '').trim();
-        parsed = JSON.parse(cleaned);
-      } catch(e) {
-        throw new Error('AI returned invalid format. Try again.');
-      }
-
-      // Validate structure
-      if (!parsed.bigIdea || !parsed.keyPoints) {
-        throw new Error('AI response missing required fields. Try again.');
-      }
-
+      const parsed = await callOpenAI(messages);
+      if (!Array.isArray(parsed)) throw new Error('Expected array of sections');
       S.aiSummary = parsed;
-      S.chatHistory.push({
-        role: 'assistant',
-        content: JSON.stringify(parsed),
-        _display: 'Summary updated based on your request.'
-      });
-
+      saveAISummary(S.chapter, parsed);
+      S.chatHistory.push({ role: 'assistant', content: JSON.stringify(parsed), _display: 'Summary reshaped.' });
     } catch(e) {
-      S.chatHistory.push({
-        role: 'assistant',
-        content: '',
-        _display: `Error: ${e.message}`
-      });
+      S.chatHistory.push({ role: 'assistant', content: '', _display: `Error: ${e.message}` });
       showToast(e.message);
     }
 
     S.chatBusy = false;
     renderSummary();
   }
+
+  // Save/load AI summaries per book+chapter in localStorage
+  function saveAISummary(chIdx, data) {
+    if (!S.book) return;
+    const key = 'aisum-' + S.book.id;
+    let all = {};
+    try { all = JSON.parse(load(key)) || {}; } catch(e) {}
+    all[String(chIdx)] = data;
+    save(key, all);
+  }
+
+  function loadAISummary(chIdx) {
+    if (!S.book) return null;
+    try {
+      const all = JSON.parse(load('aisum-' + S.book.id)) || {};
+      return all[String(chIdx)] || null;
+    } catch(e) { return null; }
+  }
+
+  // ========== Batch: Process all chapters ==========
+  let batchAbort = false;
+
+  $('processAllBtn').addEventListener('click', async () => {
+    if (!S.apiKey) { showToast('Set your OpenAI API key first'); return; }
+    if (!S.book) { showToast('Open a book first'); return; }
+
+    const btn = $('processAllBtn');
+    const prog = $('processProgress');
+    const text = $('processProgressText');
+    const fill = $('processProgressFill');
+    const log = $('processLog');
+
+    btn.disabled = true;
+    btn.textContent = 'Processing... (close panel to cancel)';
+    batchAbort = false;
+    prog.classList.add('show');
+    log.innerHTML = '';
+
+    const total = S.book.chapters.length;
+    let done = 0;
+    let errors = 0;
+
+    for (let i = 0; i < total; i++) {
+      if (batchAbort) { log.innerHTML += '<div>Cancelled.</div>'; break; }
+
+      const chTitle = S.book.chapters[i].title;
+      text.textContent = `Processing ${i + 1} / ${total}: ${chTitle}`;
+      fill.style.width = ((i / total) * 100) + '%';
+
+      // Skip chapters with very little content
+      const segs = S.book.chapters[i].segments || [];
+      if (segs.length < 3) {
+        log.innerHTML += `<div class="log-ok">${i + 1}. ${esc(chTitle)} - skipped (too short)</div>`;
+        done++;
+        continue;
+      }
+
+      try {
+        const result = await generateSummaryForChapter(i);
+        saveAISummary(i, result);
+        log.innerHTML += `<div class="log-ok">${i + 1}. ${esc(chTitle)} - done</div>`;
+        done++;
+      } catch(e) {
+        log.innerHTML += `<div class="log-err">${i + 1}. ${esc(chTitle)} - ${esc(e.message)}</div>`;
+        errors++;
+        // Rate limit: wait longer on error
+        await new Promise(r => setTimeout(r, 3000));
+      }
+
+      // Small delay between calls to avoid rate limits
+      await new Promise(r => setTimeout(r, 500));
+      log.scrollTop = log.scrollHeight;
+    }
+
+    fill.style.width = '100%';
+    text.textContent = `Done! ${done} processed, ${errors} errors.`;
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate All Chapter Summaries';
+
+    // Reload current chapter summary
+    S.aiSummary = loadAISummary(S.chapter);
+    if (S.readerMode === 'summary') renderSummary();
+  });
 
   // ========== Chat bar events ==========
   $('chatSend').addEventListener('click', () => {
@@ -1239,13 +1406,9 @@ Rules:
   });
 
   $('chatInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      $('chatSend').click();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSend').click(); }
   });
 
-  // Auto-resize textarea
   $('chatInput').addEventListener('input', () => {
     const el = $('chatInput');
     el.style.height = 'auto';
@@ -1256,16 +1419,20 @@ Rules:
   $('apiKeyInput').addEventListener('change', e => {
     const key = e.target.value.trim();
     if (key) {
-      S.apiKey = key;
-      save('apiKey', key);
+      S.apiKey = key; save('apiKey', key);
       $('apiKeyDot').className = 'api-key-dot set';
       $('apiKeyStatus').textContent = 'Key saved';
     } else {
-      S.apiKey = null;
-      save('apiKey', '');
+      S.apiKey = null; save('apiKey', '');
       $('apiKeyDot').className = 'api-key-dot unset';
       $('apiKeyStatus').textContent = 'Not set';
     }
+  });
+
+  // ========== Instructions ==========
+  $('instructionsInput').value = getInstructions();
+  $('instructionsInput').addEventListener('input', e => {
+    save('instructions', e.target.value);
   });
 
   function toggleReaderMode() {
@@ -1298,7 +1465,7 @@ Rules:
     S.chapter = idx;
     S.cur = 0;
     S.curSentence = 0;
-    S.aiSummary = null;
+    S.aiSummary = loadAISummary(idx);
     S.chatHistory = [];
     if (S.playing) { stopSpeaking(); }
     if (S.readerMode === 'summary') {
