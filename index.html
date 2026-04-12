@@ -737,7 +737,15 @@
     <div class="panel-body">
       <div class="setting-row"><span class="setting-label">Theme</span><div class="setting-control"><button class="theme-btn active" data-t="dark"></button><button class="theme-btn" data-t="light"></button><button class="theme-btn" data-t="sepia"></button></div></div>
       <div class="setting-row"><span class="setting-label">Font Size</span><div class="setting-control"><button class="font-btn" id="fontDown">A-</button><span class="font-size-label" id="fontSizeLabel">16</span><button class="font-btn" id="fontUp">A+</button></div></div>
-      <div class="setting-row"><span class="setting-label">Voice</span><div class="setting-control" style="flex:1;margin-left:12px"><select class="voice-select" id="voiceSelect"></select></div></div>
+      <div class="setting-row"><span class="setting-label">Voice</span><div class="setting-control" style="flex:1;margin-left:12px"><select class="voice-select" id="voiceSelect">
+        <option value="alloy">Alloy (neutral)</option>
+        <option value="nova" selected>Nova (female, warm)</option>
+        <option value="shimmer">Shimmer (female, clear)</option>
+        <option value="echo">Echo (male, deep)</option>
+        <option value="fable">Fable (male, British)</option>
+        <option value="onyx">Onyx (male, authoritative)</option>
+      </select></div></div>
+      <div class="setting-row"><span class="setting-label" style="font-size:11px;color:var(--text-muted)">Uses OpenAI TTS when API key is set. Falls back to browser voice otherwise.</span></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Speed</span><div class="speed-picker" id="speedPicker"></div></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Sleep Timer</span><div class="sleep-display" id="sleepPicker"></div></div>
 
@@ -1581,7 +1589,11 @@ Rules for each section:
     if (S.playing) { stopSpeaking(); speakCurrent(); }
   }
 
-  // ========== Speech ==========
+  // ========== Speech (OpenAI TTS + Web Speech fallback) ==========
+  let ttsAudio = new Audio();
+  let ttsAbort = null; // AbortController
+  let ttsCache = new Map(); // text+voice -> blob URL
+
   function speakCurrent() {
     const segs = currentSegments();
     if (S.cur >= segs.length) return;
@@ -1589,14 +1601,22 @@ Rules for each section:
     speakSentence(sentences, S.curSentence);
   }
 
-  function speakSentence(sentences, si) {
-    if (si >= sentences.length) {
+  function advanceAfterSentence(sentences, si) {
+    if (si >= sentences.length - 1) {
       if (S.cur < currentSegments().length - 1) {
         S.cur++; S.curSentence = 0; updateUI(); speakCurrent();
       } else if (S.book && S.chapter < S.book.chapters.length - 1) {
         switchChapter(S.chapter + 1);
         if (S.playing) speakCurrent();
       } else { pause(); }
+    } else {
+      speakSentence(sentences, si + 1);
+    }
+  }
+
+  function speakSentence(sentences, si) {
+    if (si >= sentences.length) {
+      advanceAfterSentence(sentences, si);
       return;
     }
 
@@ -1604,15 +1624,105 @@ Rules for each section:
     const active = document.querySelector('.seg.active');
     if (active) active.querySelectorAll('.sentence').forEach((el,i) => el.classList.toggle('current', i===si));
 
+    // Pre-fetch next sentence in background
+    if (S.apiKey && si + 1 < sentences.length) {
+      prefetchTTS(sentences[si + 1]);
+    }
+
+    // Use OpenAI TTS if API key is set
+    if (S.apiKey) {
+      speakWithOpenAI(sentences, si);
+    } else {
+      speakWithBrowser(sentences, si);
+    }
+  }
+
+  async function speakWithOpenAI(sentences, si) {
+    const text = sentences[si];
+    const voice = S.voiceURI || 'nova';
+    const cacheKey = voice + ':' + text;
+
+    try {
+      let blobUrl = ttsCache.get(cacheKey);
+
+      if (!blobUrl) {
+        ttsAbort = new AbortController();
+        const res = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.apiKey}` },
+          body: JSON.stringify({ model: 'tts-1', input: text, voice: voice, response_format: 'mp3' }),
+          signal: ttsAbort.signal,
+        });
+
+        if (!res.ok) {
+          // Fall back to browser TTS on error
+          console.warn('OpenAI TTS error, falling back to browser');
+          speakWithBrowser(sentences, si);
+          return;
+        }
+
+        const blob = await res.blob();
+        blobUrl = URL.createObjectURL(blob);
+        ttsCache.set(cacheKey, blobUrl);
+
+        // Keep cache under 50 entries
+        if (ttsCache.size > 50) {
+          const first = ttsCache.keys().next().value;
+          URL.revokeObjectURL(ttsCache.get(first));
+          ttsCache.delete(first);
+        }
+      }
+
+      ttsAudio.src = blobUrl;
+      ttsAudio.playbackRate = S.speed;
+      ttsAudio.onended = () => { if (S.playing) advanceAfterSentence(sentences, si); };
+      ttsAudio.onerror = () => { if (S.playing) advanceAfterSentence(sentences, si); };
+      await ttsAudio.play();
+
+    } catch(e) {
+      if (e.name === 'AbortError') return; // cancelled intentionally
+      console.warn('TTS error:', e);
+      if (S.playing) advanceAfterSentence(sentences, si);
+    }
+  }
+
+  async function prefetchTTS(text) {
+    const voice = S.voiceURI || 'nova';
+    const cacheKey = voice + ':' + text;
+    if (ttsCache.has(cacheKey)) return;
+
+    try {
+      const res = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.apiKey}` },
+        body: JSON.stringify({ model: 'tts-1', input: text, voice: voice, response_format: 'mp3' }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        ttsCache.set(cacheKey, URL.createObjectURL(blob));
+      }
+    } catch(e) { /* silent prefetch failure */ }
+  }
+
+  function speakWithBrowser(sentences, si) {
     const u = new SpeechSynthesisUtterance(sentences[si]);
     u.rate = S.speed;
-    if (S.voiceURI) { const v=S.voices.find(v=>v.voiceURI===S.voiceURI); if(v) u.voice=v; }
-    u.onend = () => { if(S.playing) speakSentence(sentences, si+1); };
-    u.onerror = e => { if(e.error!=='canceled'&&S.playing) speakSentence(sentences, si+1); };
+    u.onend = () => { if(S.playing) advanceAfterSentence(sentences, si); };
+    u.onerror = e => { if(e.error!=='canceled'&&S.playing) advanceAfterSentence(sentences, si); };
     synth.speak(u);
   }
 
-  function stopSpeaking() { synth.cancel(); }
+  function stopSpeaking() {
+    // Stop OpenAI TTS
+    ttsAudio.pause();
+    ttsAudio.currentTime = 0;
+    ttsAudio.onended = null;
+    ttsAudio.onerror = null;
+    if (ttsAbort) { ttsAbort.abort(); ttsAbort = null; }
+    // Stop browser TTS
+    synth.cancel();
+  }
+
   function play() { S.playing=true; updateUI(); speakCurrent(); }
   function pause() { S.playing=false; stopSpeaking(); updateUI(); }
   function togglePlay() { S.playing?pause():play(); }
@@ -1621,7 +1731,12 @@ Rules for each section:
   function setSpeed(v) {
     S.speed=Math.max(0.5,Math.min(3,v));
     $('speedLabel').textContent=S.speed+'x'; save('speed',S.speed); renderSpeedPicker();
-    if(S.playing){stopSpeaking();speakCurrent();}
+    // For OpenAI TTS, just update playback rate without restarting
+    if (S.apiKey && !ttsAudio.paused) {
+      ttsAudio.playbackRate = S.speed;
+    } else if (S.playing) {
+      stopSpeaking(); speakCurrent();
+    }
   }
   function renderSpeedPicker() {
     $('speedPicker').innerHTML=SPEEDS.map(s=>`<button class="speed-opt ${s===S.speed?'active':''}" data-s="${s}">${s}x</button>`).join('');
@@ -1857,18 +1972,20 @@ Rules for each section:
   $('reader')?.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
   $('reader')?.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchX;if(Math.abs(dx)>80){dx>0?prev():next();}},{passive:true});
 
-  // ========== Voices ==========
-  function loadVoices(){
-    S.voices=synth.getVoices().filter(v=>v.lang.startsWith('en'));
-    const sel=$('voiceSelect'); sel.innerHTML='';
-    S.voices.forEach(v=>{const o=document.createElement('option');o.value=v.voiceURI;o.textContent=v.name.replace(/Microsoft |Google |Amazon |Apple /g,'').substring(0,30);if(v.default)o.selected=true;sel.appendChild(o);});
-    const saved=load('voice'); if(saved){sel.value=saved;S.voiceURI=saved;}
-  }
-  synth.onvoiceschanged=loadVoices; loadVoices();
-  $('voiceSelect').addEventListener('change',e=>{S.voiceURI=e.target.value;save('voice',S.voiceURI);if(S.playing){stopSpeaking();speakCurrent();}});
+  // ========== Voice selector ==========
+  const savedVoice = load('voice');
+  if (savedVoice) { S.voiceURI = savedVoice; $('voiceSelect').value = savedVoice; }
+  else { S.voiceURI = 'nova'; }
 
-  // Chrome speech bug workaround
-  setInterval(()=>{if(S.playing&&synth.speaking){synth.pause();synth.resume();}},10000);
+  $('voiceSelect').addEventListener('change', e => {
+    S.voiceURI = e.target.value;
+    save('voice', S.voiceURI);
+    ttsCache.clear(); // clear cache when voice changes
+    if (S.playing) { stopSpeaking(); speakCurrent(); }
+  });
+
+  // Chrome speech bug workaround (only needed for browser fallback)
+  setInterval(() => { if (S.playing && !S.apiKey && synth.speaking) { synth.pause(); synth.resume(); } }, 10000);
 
   // ========== Service Worker ==========
   if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
