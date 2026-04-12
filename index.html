@@ -1475,6 +1475,9 @@ Rules for each section:
     S.curSentence = 0;
     S.aiSummary = loadAISummary(idx);
     S.chatHistory = [];
+    // Clear TTS cache for old chapter
+    ttsCache.forEach(url => URL.revokeObjectURL(url));
+    ttsCache.clear();
     if (S.playing) { stopSpeaking(); }
     if (S.readerMode === 'summary') {
       renderSummary();
@@ -1597,8 +1600,15 @@ Rules for each section:
   function speakCurrent() {
     const segs = currentSegments();
     if (S.cur >= segs.length) return;
-    const sentences = splitSentences(segs[S.cur].text);
-    speakSentence(sentences, S.curSentence);
+
+    if (S.apiKey) {
+      // OpenAI TTS: one call per full segment, continuous audio
+      speakSegmentWithOpenAI();
+    } else {
+      // Browser fallback: sentence by sentence
+      const sentences = splitSentences(segs[S.cur].text);
+      speakSentence(sentences, S.curSentence);
+    }
   }
 
   function advanceAfterSentence(sentences, si) {
@@ -1614,33 +1624,36 @@ Rules for each section:
     }
   }
 
-  function speakSentence(sentences, si) {
-    if (si >= sentences.length) {
-      advanceAfterSentence(sentences, si);
-      return;
-    }
+  // -- OpenAI TTS: speak full segment, estimate sentence timing --
 
+  function speakSentence(sentences, si) {
+    // Browser fallback: sentence-by-sentence
+    if (si >= sentences.length) { advanceAfterSentence(sentences, si); return; }
     S.curSentence = si;
     const active = document.querySelector('.seg.active');
     if (active) active.querySelectorAll('.sentence').forEach((el,i) => el.classList.toggle('current', i===si));
 
-    // Pre-fetch next sentence in background
-    if (S.apiKey && si + 1 < sentences.length) {
-      prefetchTTS(sentences[si + 1]);
-    }
-
-    // Use OpenAI TTS if API key is set
-    if (S.apiKey) {
-      speakWithOpenAI(sentences, si);
-    } else {
-      speakWithBrowser(sentences, si);
-    }
+    const u = new SpeechSynthesisUtterance(sentences[si]);
+    u.rate = S.speed;
+    u.onend = () => { if(S.playing) advanceAfterSentence(sentences, si); };
+    u.onerror = e => { if(e.error!=='canceled'&&S.playing) advanceAfterSentence(sentences, si); };
+    synth.speak(u);
   }
 
-  async function speakWithOpenAI(sentences, si) {
-    const text = sentences[si];
+  // Full-segment TTS approach for OpenAI
+  let ttsHighlightTimer = null;
+
+  async function speakSegmentWithOpenAI() {
+    const segs = currentSegments();
+    if (S.cur >= segs.length) return;
+
+    const fullText = segs[S.cur].text;
+    const sentences = splitSentences(fullText);
     const voice = S.voiceURI || 'nova';
-    const cacheKey = voice + ':' + text;
+    const cacheKey = voice + ':seg:' + S.cur + ':' + S.chapter;
+
+    // Pre-fetch next segment
+    prefetchNextSegment();
 
     try {
       let blobUrl = ttsCache.get(cacheKey);
@@ -1650,14 +1663,13 @@ Rules for each section:
         const res = await fetch('https://api.openai.com/v1/audio/speech', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.apiKey}` },
-          body: JSON.stringify({ model: 'tts-1', input: text, voice: voice, response_format: 'mp3' }),
+          body: JSON.stringify({ model: 'tts-1', input: fullText, voice, response_format: 'mp3' }),
           signal: ttsAbort.signal,
         });
 
         if (!res.ok) {
-          // Fall back to browser TTS on error
           console.warn('OpenAI TTS error, falling back to browser');
-          speakWithBrowser(sentences, si);
+          speakSentence(sentences, S.curSentence);
           return;
         }
 
@@ -1665,61 +1677,113 @@ Rules for each section:
         blobUrl = URL.createObjectURL(blob);
         ttsCache.set(cacheKey, blobUrl);
 
-        // Keep cache under 50 entries
-        if (ttsCache.size > 50) {
+        if (ttsCache.size > 30) {
           const first = ttsCache.keys().next().value;
           URL.revokeObjectURL(ttsCache.get(first));
           ttsCache.delete(first);
         }
       }
 
+      if (!S.playing) return;
+
       ttsAudio.src = blobUrl;
       ttsAudio.playbackRate = S.speed;
-      ttsAudio.onended = () => { if (S.playing) advanceAfterSentence(sentences, si); };
-      ttsAudio.onerror = () => { if (S.playing) advanceAfterSentence(sentences, si); };
+
+      // Sentence highlighting based on estimated timing
+      ttsAudio.onloadedmetadata = () => {
+        setupSentenceHighlighting(sentences, ttsAudio.duration);
+      };
+
+      ttsAudio.onended = () => {
+        clearInterval(ttsHighlightTimer);
+        if (!S.playing) return;
+        // Advance to next segment
+        if (S.cur < segs.length - 1) {
+          S.cur++; S.curSentence = 0; updateUI();
+          speakSegmentWithOpenAI();
+        } else if (S.book && S.chapter < S.book.chapters.length - 1) {
+          switchChapter(S.chapter + 1);
+          if (S.playing) speakSegmentWithOpenAI();
+        } else { pause(); }
+      };
+
+      ttsAudio.onerror = () => {
+        clearInterval(ttsHighlightTimer);
+        if (S.playing) {
+          if (S.cur < segs.length - 1) { S.cur++; S.curSentence = 0; updateUI(); speakSegmentWithOpenAI(); }
+          else pause();
+        }
+      };
+
       await ttsAudio.play();
 
     } catch(e) {
-      if (e.name === 'AbortError') return; // cancelled intentionally
+      if (e.name === 'AbortError') return;
       console.warn('TTS error:', e);
-      if (S.playing) advanceAfterSentence(sentences, si);
+      // Fallback to browser for this segment
+      speakSentence(splitSentences(fullText), S.curSentence);
     }
   }
 
-  async function prefetchTTS(text) {
+  function setupSentenceHighlighting(sentences, duration) {
+    clearInterval(ttsHighlightTimer);
+
+    // Build cumulative character offsets for timing estimation
+    const totalChars = sentences.reduce((a, s) => a + s.length, 0);
+    const boundaries = [];
+    let cumChars = 0;
+    sentences.forEach(s => {
+      boundaries.push(cumChars / totalChars);
+      cumChars += s.length;
+    });
+
+    ttsHighlightTimer = setInterval(() => {
+      if (ttsAudio.paused || !S.playing) { clearInterval(ttsHighlightTimer); return; }
+
+      const pct = ttsAudio.currentTime / (duration || 1);
+      let currentSi = 0;
+      for (let i = boundaries.length - 1; i >= 0; i--) {
+        if (pct >= boundaries[i]) { currentSi = i; break; }
+      }
+
+      if (currentSi !== S.curSentence) {
+        S.curSentence = currentSi;
+        const active = document.querySelector('.seg.active');
+        if (active) active.querySelectorAll('.sentence').forEach((el, i) => el.classList.toggle('current', i === currentSi));
+      }
+    }, 150);
+  }
+
+  async function prefetchNextSegment() {
+    const segs = currentSegments();
+    const nextIdx = S.cur + 1;
+    if (nextIdx >= segs.length) return;
+
     const voice = S.voiceURI || 'nova';
-    const cacheKey = voice + ':' + text;
+    const cacheKey = voice + ':seg:' + nextIdx + ':' + S.chapter;
     if (ttsCache.has(cacheKey)) return;
 
     try {
       const res = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${S.apiKey}` },
-        body: JSON.stringify({ model: 'tts-1', input: text, voice: voice, response_format: 'mp3' }),
+        body: JSON.stringify({ model: 'tts-1', input: segs[nextIdx].text, voice, response_format: 'mp3' }),
       });
       if (res.ok) {
         const blob = await res.blob();
         ttsCache.set(cacheKey, URL.createObjectURL(blob));
       }
-    } catch(e) { /* silent prefetch failure */ }
-  }
-
-  function speakWithBrowser(sentences, si) {
-    const u = new SpeechSynthesisUtterance(sentences[si]);
-    u.rate = S.speed;
-    u.onend = () => { if(S.playing) advanceAfterSentence(sentences, si); };
-    u.onerror = e => { if(e.error!=='canceled'&&S.playing) advanceAfterSentence(sentences, si); };
-    synth.speak(u);
+    } catch(e) { /* silent */ }
   }
 
   function stopSpeaking() {
-    // Stop OpenAI TTS
+    clearInterval(ttsHighlightTimer);
     ttsAudio.pause();
     ttsAudio.currentTime = 0;
     ttsAudio.onended = null;
     ttsAudio.onerror = null;
+    ttsAudio.onloadedmetadata = null;
     if (ttsAbort) { ttsAbort.abort(); ttsAbort = null; }
-    // Stop browser TTS
     synth.cancel();
   }
 
@@ -1980,7 +2044,9 @@ Rules for each section:
   $('voiceSelect').addEventListener('change', e => {
     S.voiceURI = e.target.value;
     save('voice', S.voiceURI);
-    ttsCache.clear(); // clear cache when voice changes
+    // Clear cache when voice changes (URLs are voice-specific)
+    ttsCache.forEach(url => URL.revokeObjectURL(url));
+    ttsCache.clear();
     if (S.playing) { stopSpeaking(); speakCurrent(); }
   });
 
