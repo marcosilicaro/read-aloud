@@ -204,7 +204,7 @@
     .badge.show { display:block; }
 
     /* ===== Visual Summary View ===== */
-    .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 280px; }
+    .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 100px; }
 
     .summary-hero {
       background: linear-gradient(135deg, var(--accent-soft), rgba(124,108,252,0.05));
@@ -291,6 +291,99 @@
 
     /* View toggle button highlight */
     .icon-btn.view-toggle.summary-active { color:var(--accent); background:var(--accent-soft); }
+
+    /* ===== Chat bar (summary mode) ===== */
+    .chat-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      background:var(--surface); border-top:1px solid rgba(128,128,128,0.1);
+      padding:10px 16px; padding-bottom:max(10px, env(safe-area-inset-bottom));
+      z-index:100; display:none;
+    }
+    .chat-bar.show { display:block; }
+
+    .chat-input-row {
+      display:flex; gap:8px; align-items:flex-end; max-width:680px; margin:0 auto;
+    }
+
+    .chat-input {
+      flex:1; padding:10px 14px; border-radius:20px;
+      border:1px solid rgba(128,128,128,0.15); background:var(--surface-2);
+      color:var(--text); font-size:14px; font-family:var(--font-ui);
+      outline:none; resize:none; max-height:100px; min-height:40px;
+      line-height:1.4; transition:border-color 0.2s;
+    }
+    .chat-input:focus { border-color:var(--accent); }
+    .chat-input::placeholder { color:var(--text-muted); }
+
+    .chat-send {
+      width:40px; height:40px; border-radius:50%; border:none;
+      background:var(--accent); color:white; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s; flex-shrink:0;
+    }
+    .chat-send:hover { box-shadow:0 2px 12px var(--accent-glow); }
+    .chat-send:disabled { opacity:0.4; cursor:not-allowed; }
+    .chat-send svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+    /* Chat messages in summary view */
+    .chat-history {
+      max-width:680px; margin:0 auto; padding:0 24px;
+    }
+
+    .chat-msg {
+      margin-bottom:12px; padding:10px 14px; border-radius:var(--radius);
+      font-size:13px; line-height:1.5; max-width:85%;
+    }
+
+    .chat-msg.user {
+      background:var(--accent); color:white;
+      margin-left:auto; border-bottom-right-radius:4px;
+    }
+
+    .chat-msg.ai {
+      background:var(--surface); color:var(--text-secondary);
+      border:1px solid rgba(128,128,128,0.08);
+      border-bottom-left-radius:4px;
+    }
+
+    .chat-msg.ai .chat-thinking {
+      display:inline-flex; gap:4px; align-items:center;
+    }
+
+    .chat-msg.ai .chat-thinking span {
+      width:6px; height:6px; background:var(--text-muted); border-radius:50%;
+      animation:chatPulse 1.2s ease-in-out infinite;
+    }
+    .chat-msg.ai .chat-thinking span:nth-child(2) { animation-delay:0.2s; }
+    .chat-msg.ai .chat-thinking span:nth-child(3) { animation-delay:0.4s; }
+
+    @keyframes chatPulse {
+      0%,80%,100% { opacity:0.3; transform:scale(0.8); }
+      40% { opacity:1; transform:scale(1); }
+    }
+
+    /* API key setting */
+    .api-key-input {
+      background:var(--surface-2); color:var(--text); border:1px solid rgba(128,128,128,0.15);
+      padding:6px 10px; border-radius:var(--radius-sm); font-size:12px;
+      font-family:var(--font-ui); width:100%; outline:none;
+      letter-spacing:1px;
+    }
+    .api-key-input:focus { border-color:var(--accent); }
+
+    .api-key-status {
+      font-size:11px; margin-top:4px; display:flex; align-items:center; gap:4px;
+    }
+    .api-key-dot { width:6px; height:6px; border-radius:50%; }
+    .api-key-dot.set { background:#3ecfb0; }
+    .api-key-dot.unset { background:var(--text-muted); }
+
+    /* Summary generating overlay */
+    .summary-generating {
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      padding:20px; color:var(--text-muted); font-size:13px;
+    }
+    .summary-generating .spinner { width:20px; height:20px; border-width:2px; }
 
     /* Reader area */
     .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; }
@@ -604,10 +697,23 @@
       <div class="setting-row"><span class="setting-label">Voice</span><div class="setting-control" style="flex:1;margin-left:12px"><select class="voice-select" id="voiceSelect"></select></div></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Speed</span><div class="speed-picker" id="speedPicker"></div></div>
       <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px"><span class="setting-label">Sleep Timer</span><div class="sleep-display" id="sleepPicker"></div></div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <span class="setting-label">OpenAI API Key (for AI summaries)</span>
+        <input class="api-key-input" id="apiKeyInput" type="password" placeholder="sk-..." autocomplete="off">
+        <div class="api-key-status"><div class="api-key-dot unset" id="apiKeyDot"></div><span id="apiKeyStatus">Not set</span></div>
+      </div>
     </div>
   </div>
 
-  <!-- Search panel removed - replaced by visual summary toggle -->
+  <!-- Chat bar for AI summary -->
+  <div class="chat-bar" id="chatBar">
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chatInput" placeholder="Ask to reshape the summary..." rows="1"></textarea>
+      <button class="chat-send" id="chatSend" title="Send">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
 
   <!-- Confirm dialog -->
   <div class="confirm-overlay" id="confirmOverlay">
@@ -651,6 +757,10 @@
     view: 'library',   // 'library' | 'reader'
     readerMode: 'text', // 'text' | 'summary'
     summaries: null,    // loaded summaries data
+    apiKey: null,
+    chatHistory: [],    // [{role,content}] for current chapter
+    aiSummary: null,    // AI-generated summary for current chapter
+    chatBusy: false,
   };
 
   const $ = id => document.getElementById(id);
@@ -872,6 +982,9 @@
     $('viewToggleBtn').classList.remove('summary-active');
     $('viewToggleIcon').innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
     $('controlsWrapper').style.display = '';
+    $('chatBar').classList.remove('show');
+    S.aiSummary = null;
+    S.chatHistory = [];
 
     await loadSummaries();
     renderChapter();
@@ -893,26 +1006,17 @@
     return S.summaries._default || null;
   }
 
-  function renderSummary() {
-    const rc = $('readerContent');
-    const sum = getSummary(S.book?.id, S.chapter);
-    const ch = S.book?.chapters?.[S.chapter];
+  // ========== Summary rendering ==========
+  function summaryCardsHTML(sum, ch) {
+    let html = '';
 
-    if (!sum || !ch) {
-      rc.innerHTML = '<p style="color:var(--text-muted);padding:40px;text-align:center">No summary available for this chapter.</p>';
-      return;
-    }
-
-    let html = '<div class="summary-view">';
-
-    // Hero: Big Idea
+    // Hero
     html += `<div class="summary-hero">
       ${sum.period ? `<div class="summary-hero-period">${esc(ch.title)} &middot; ${esc(sum.period)}</div>` : `<div class="summary-hero-period">${esc(ch.title)}</div>`}
       <div class="summary-hero-idea">${esc(sum.bigIdea)}</div>
     </div>`;
 
-    // Key Points
-    if (sum.keyPoints.length) {
+    if (sum.keyPoints && sum.keyPoints.length) {
       html += '<div class="summary-section-title">Key Takeaways</div>';
       sum.keyPoints.forEach(kp => {
         html += `<div class="summary-card">
@@ -925,54 +1029,244 @@
       });
     }
 
-    // Key Figures
-    if (sum.keyFigures.length) {
+    if (sum.keyFigures && sum.keyFigures.length) {
       html += '<div class="summary-section-title">Key Figures</div><div class="summary-figures">';
       sum.keyFigures.forEach(name => {
         const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-        html += `<div class="summary-figure">
-          <div class="summary-figure-avatar">${initials}</div>
-          <span>${esc(name)}</span>
-        </div>`;
+        html += `<div class="summary-figure"><div class="summary-figure-avatar">${initials}</div><span>${esc(name)}</span></div>`;
       });
       html += '</div>';
     }
 
-    // Key Terms
-    if (sum.keyTerms.length) {
+    if (sum.keyTerms && sum.keyTerms.length) {
       html += '<div class="summary-section-title">Key Concepts</div><div class="summary-tags">';
       sum.keyTerms.forEach(t => { html += `<div class="summary-tag">${esc(t)}</div>`; });
       html += '</div>';
+    }
+
+    return html;
+  }
+
+  function renderSummary() {
+    const rc = $('readerContent');
+    const ch = S.book?.chapters?.[S.chapter];
+
+    // Use AI summary if available, else fall back to pre-built
+    const sum = S.aiSummary || getSummary(S.book?.id, S.chapter);
+
+    if (!ch) {
+      rc.innerHTML = '<p style="color:var(--text-muted);padding:40px;text-align:center">No chapter selected.</p>';
+      return;
+    }
+
+    let html = '<div class="summary-view">';
+
+    if (sum) {
+      html += summaryCardsHTML(sum, ch);
+    } else {
+      html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
+        <div class="summary-hero-idea" style="color:var(--text-muted)">No pre-built summary. Use the chat below to generate one with AI.</div></div>`;
+    }
+
+    // Chat history
+    if (S.chatHistory.length) {
+      html += '<div class="summary-section-title">Conversation</div>';
+      html += '<div class="chat-history">';
+      S.chatHistory.forEach(msg => {
+        if (msg.role === 'user') {
+          html += `<div class="chat-msg user">${esc(msg.content)}</div>`;
+        } else if (msg.role === 'assistant' && msg._display) {
+          html += `<div class="chat-msg ai">${esc(msg._display)}</div>`;
+        }
+      });
+      html += '</div>';
+    }
+
+    // Loading indicator
+    if (S.chatBusy) {
+      html += '<div class="chat-history"><div class="chat-msg ai"><div class="chat-thinking"><span></span><span></span><span></span></div></div></div>';
     }
 
     // Navigation
     const hasPrev = S.chapter > 0;
     const hasNext = S.book && S.chapter < S.book.chapters.length - 1;
     html += '<div class="summary-nav">';
-    if (hasPrev) {
-      html += `<button class="summary-nav-btn" data-dir="prev">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        Prev Chapter
-      </button>`;
-    }
-    if (hasNext) {
-      html += `<button class="summary-nav-btn" data-dir="next">
-        Next Chapter
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>`;
-    }
+    if (hasPrev) html += `<button class="summary-nav-btn" data-dir="prev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Prev Chapter</button>`;
+    if (hasNext) html += `<button class="summary-nav-btn" data-dir="next">Next Chapter <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
     html += '</div></div>';
 
     rc.innerHTML = html;
     rc.querySelectorAll('.summary-nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchChapter(S.chapter + (btn.dataset.dir === 'prev' ? -1 : 1));
-      });
+      btn.addEventListener('click', () => switchChapter(S.chapter + (btn.dataset.dir === 'prev' ? -1 : 1)));
     });
 
-    // Scroll to top
-    $('reader').scrollTop = 0;
+    // Scroll to bottom if there's chat, else to top
+    if (S.chatHistory.length || S.chatBusy) {
+      $('reader').scrollTop = $('reader').scrollHeight;
+    } else {
+      $('reader').scrollTop = 0;
+    }
   }
+
+  // ========== OpenAI integration ==========
+  function getChapterText() {
+    const ch = S.book?.chapters?.[S.chapter];
+    if (!ch) return '';
+    // Send up to ~6000 chars of chapter text to stay within token limits
+    const fullText = ch.segments.map(s => s.text).join('\n');
+    return fullText.length > 6000 ? fullText.substring(0, 6000) + '...' : fullText;
+  }
+
+  const SUMMARY_SYSTEM_PROMPT = `You are a reading assistant that creates visual chapter summaries. Given chapter text and user instructions, generate a structured JSON summary.
+
+ALWAYS respond with ONLY valid JSON in this exact format:
+{
+  "period": "time period covered (or empty string)",
+  "bigIdea": "One-sentence central thesis of the chapter",
+  "keyPoints": [
+    {"icon": "emoji", "title": "Short title", "text": "2-3 sentence explanation"}
+  ],
+  "keyFigures": ["Person 1", "Person 2"],
+  "keyTerms": ["Term 1", "Term 2"]
+}
+
+Rules:
+- 3-6 key points, each with a relevant emoji icon
+- Tailor the summary to what the user asks for (focus area, complexity level, perspective, etc.)
+- If user asks to "focus on X", restructure all fields around that angle
+- Keep keyPoints text concise but substantive (2-3 sentences each)
+- Use accurate, relevant emoji icons for each key point
+- Return ONLY the JSON object, no markdown, no explanation`;
+
+  async function sendChatMessage(userMsg) {
+    if (!S.apiKey) {
+      showToast('Set your OpenAI API key in Settings');
+      return;
+    }
+    if (S.chatBusy) return;
+
+    S.chatBusy = true;
+    S.chatHistory.push({ role: 'user', content: userMsg });
+    renderSummary();
+
+    // Build messages
+    const messages = [
+      { role: 'system', content: SUMMARY_SYSTEM_PROMPT },
+      { role: 'user', content: `Here is the chapter text:\n\n${getChapterText()}` }
+    ];
+
+    // Add conversation history (only user messages and summary-request context)
+    const currentSum = S.aiSummary || getSummary(S.book?.id, S.chapter);
+    if (currentSum && S.chatHistory.length <= 1) {
+      messages.push({ role: 'user', content: `The current summary is:\n${JSON.stringify(currentSum)}\n\nPlease reshape this summary based on my request: ${userMsg}` });
+    } else {
+      // For follow-up messages, include the conversation
+      S.chatHistory.forEach(msg => {
+        if (msg.role === 'user') {
+          messages.push({ role: 'user', content: msg.content });
+        } else if (msg.role === 'assistant') {
+          messages.push({ role: 'assistant', content: msg.content });
+        }
+      });
+    }
+
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${S.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 1500,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${res.status}`);
+      }
+
+      const data = await res.json();
+      const content = data.choices?.[0]?.message?.content || '';
+
+      // Parse the JSON response
+      let parsed;
+      try {
+        // Strip markdown code fences if present
+        const cleaned = content.replace(/```json?\n?/g, '').replace(/```\n?/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch(e) {
+        throw new Error('AI returned invalid format. Try again.');
+      }
+
+      // Validate structure
+      if (!parsed.bigIdea || !parsed.keyPoints) {
+        throw new Error('AI response missing required fields. Try again.');
+      }
+
+      S.aiSummary = parsed;
+      S.chatHistory.push({
+        role: 'assistant',
+        content: JSON.stringify(parsed),
+        _display: 'Summary updated based on your request.'
+      });
+
+    } catch(e) {
+      S.chatHistory.push({
+        role: 'assistant',
+        content: '',
+        _display: `Error: ${e.message}`
+      });
+      showToast(e.message);
+    }
+
+    S.chatBusy = false;
+    renderSummary();
+  }
+
+  // ========== Chat bar events ==========
+  $('chatSend').addEventListener('click', () => {
+    const input = $('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    input.style.height = 'auto';
+    sendChatMessage(msg);
+  });
+
+  $('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      $('chatSend').click();
+    }
+  });
+
+  // Auto-resize textarea
+  $('chatInput').addEventListener('input', () => {
+    const el = $('chatInput');
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  });
+
+  // ========== API key ==========
+  $('apiKeyInput').addEventListener('change', e => {
+    const key = e.target.value.trim();
+    if (key) {
+      S.apiKey = key;
+      save('apiKey', key);
+      $('apiKeyDot').className = 'api-key-dot set';
+      $('apiKeyStatus').textContent = 'Key saved';
+    } else {
+      S.apiKey = null;
+      save('apiKey', '');
+      $('apiKeyDot').className = 'api-key-dot unset';
+      $('apiKeyStatus').textContent = 'Not set';
+    }
+  });
 
   function toggleReaderMode() {
     S.readerMode = S.readerMode === 'text' ? 'summary' : 'text';
@@ -981,18 +1275,18 @@
 
     if (S.readerMode === 'summary') {
       btn.classList.add('summary-active');
-      // Switch icon to text lines
       icon.innerHTML = '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>';
       btn.title = 'Switch to text view';
       renderSummary();
       $('controlsWrapper').style.display = 'none';
+      $('chatBar').classList.add('show');
     } else {
       btn.classList.remove('summary-active');
-      // Switch icon to grid
       icon.innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
       btn.title = 'Switch to visual summary';
       renderChapter();
       $('controlsWrapper').style.display = '';
+      $('chatBar').classList.remove('show');
     }
   }
 
@@ -1004,6 +1298,8 @@
     S.chapter = idx;
     S.cur = 0;
     S.curSentence = 0;
+    S.aiSummary = null;
+    S.chatHistory = [];
     if (S.playing) { stopSpeaking(); }
     if (S.readerMode === 'summary') {
       renderSummary();
@@ -1422,6 +1718,14 @@
     const sf=load('fontSize'); if(sf) setFontSize(parseInt(sf));
     // Sleep
     renderSleepPicker();
+    // API key
+    const savedKey = load('apiKey');
+    if (savedKey) {
+      S.apiKey = savedKey;
+      $('apiKeyInput').value = savedKey;
+      $('apiKeyDot').className = 'api-key-dot set';
+      $('apiKeyStatus').textContent = 'Key saved';
+    }
 
     // Load library index
     const savedLib = load('library');
