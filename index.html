@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Read Aloud</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔊</text></svg>">
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface-hover: #252540;
+      --text: #e0e0e0;
+      --text-muted: #888;
+      --accent: #7c5cfc;
+      --accent-glow: rgba(124, 92, 252, 0.3);
+      --speaker-1: #7c5cfc;
+      --speaker-2: #00c9a7;
+      --highlight-bg: rgba(124, 92, 252, 0.15);
+      --highlight-border: #7c5cfc;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .light {
+      --bg: #f5f5f8;
+      --surface: #ffffff;
+      --surface-hover: #f0f0f5;
+      --text: #1a1a2e;
+      --text-muted: #666;
+      --accent: #6c4ce6;
+      --accent-glow: rgba(108, 76, 230, 0.2);
+      --speaker-1: #6c4ce6;
+      --speaker-2: #00a88a;
+      --highlight-bg: rgba(108, 76, 230, 0.1);
+      --highlight-border: #6c4ce6;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .icon-btn:hover { background: var(--surface-hover); color: var(--text); }
+    .icon-btn.active { color: var(--accent); }
+
+    /* Transcript area */
+    .transcript {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      padding-bottom: 220px;
+      scroll-behavior: smooth;
+    }
+
+    .segment {
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: var(--radius);
+      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .segment:hover { background: var(--surface-hover); }
+
+    .segment.active {
+      background: var(--highlight-bg);
+      border-left-color: var(--highlight-border);
+      box-shadow: var(--shadow);
+    }
+
+    .segment.active .segment-text .current-sentence {
+      background: rgba(124, 92, 252, 0.25);
+      border-radius: 4px;
+      padding: 1px 2px;
+    }
+
+    .light .segment.active .segment-text .current-sentence {
+      background: rgba(108, 76, 230, 0.18);
+    }
+
+    .segment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .speaker-name {
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .speaker-1 .speaker-name { color: var(--speaker-1); }
+    .speaker-2 .speaker-name { color: var(--speaker-2); }
+
+    .timestamp {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .segment-text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    /* Bookmark indicator */
+    .segment.bookmarked::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* Controls */
+    .controls-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 0 20px 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    /* Progress bar */
+    .progress-container {
+      width: 100%;
+      padding: 12px 0 8px;
+      cursor: pointer;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      position: relative;
+      transition: height 0.15s;
+    }
+
+    .progress-container:hover .progress-track { height: 6px; }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .progress-container:hover .progress-fill::after { opacity: 1; }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Main controls row */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+
+    .ctrl-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .ctrl-btn:hover { transform: scale(1.1); }
+    .ctrl-btn:active { transform: scale(0.95); }
+
+    .ctrl-btn.small { width: 40px; height: 40px; font-size: 20px; }
+    .ctrl-btn.medium { width: 48px; height: 48px; font-size: 22px; }
+
+    .ctrl-btn.play {
+      width: 56px;
+      height: 56px;
+      background: var(--accent);
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .ctrl-btn.play:hover {
+      box-shadow: 0 6px 24px var(--accent-glow);
+    }
+
+    /* Speed control */
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      padding: 4px 0;
+    }
+
+    .speed-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 40px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .speed-label:hover { background: var(--surface-hover); color: var(--text); }
+
+    .speed-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 120px;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    /* Import overlay */
+    .import-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .import-overlay.show { display: flex; }
+
+    .import-modal {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .import-modal h2 { margin-bottom: 16px; font-size: 20px; }
+    .import-modal p { color: var(--text-muted); margin-bottom: 20px; font-size: 14px; }
+
+    .drop-zone {
+      border: 2px dashed rgba(124, 92, 252, 0.4);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--highlight-bg);
+    }
+
+    .drop-zone-icon { font-size: 36px; margin-bottom: 8px; }
+    .drop-zone-text { font-size: 14px; color: var(--text-muted); }
+
+    .modal-close {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover { background: var(--surface-hover); color: var(--text); }
+
+    /* Bookmarks panel */
+    .bookmarks-panel {
+      display: none;
+      position: fixed;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 300px;
+      max-width: 85vw;
+      background: var(--surface);
+      z-index: 150;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+    }
+
+    .bookmarks-panel.show { display: block; }
+
+    .bookmarks-panel h3 { margin-bottom: 16px; font-size: 16px; }
+
+    .bookmark-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: background 0.2s;
+      font-size: 13px;
+    }
+
+    .bookmark-item:hover { background: var(--surface-hover); }
+    .bookmark-item .bm-speaker { font-weight: 600; font-size: 11px; text-transform: uppercase; }
+    .bookmark-item .bm-text { color: var(--text-muted); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Keyboard shortcuts help */
+    .shortcuts-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 4px 0;
+    }
+
+    .shortcuts-hint kbd {
+      background: var(--surface-hover);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: inherit;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 240px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 300;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h2 { margin-bottom: 8px; color: var(--text); }
+    .empty-state p { font-size: 14px; max-width: 300px; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .header { padding: 10px 16px; }
+      .transcript { padding: 12px 16px; }
+      .controls-wrapper { padding: 0 16px 16px; }
+      .shortcuts-hint { display: none; }
+      .segment-text { font-size: 14px; }
+    }
+
+    /* Scrollbar */
+    .transcript::-webkit-scrollbar { width: 6px; }
+    .transcript::-webkit-scrollbar-track { background: transparent; }
+    .transcript::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    /* Voice selector */
+    .voice-select {
+      background: var(--surface-hover);
+      color: var(--text);
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      max-width: 130px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Read Aloud</h1>
+    <div class="header-actions">
+      <select class="voice-select" id="voiceSelect" title="Voice"></select>
+      <button class="icon-btn" id="importBtn" title="Import document">&#x1F4C2;</button>
+      <button class="icon-btn" id="bookmarkListBtn" title="Bookmarks">&#x1F516;</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle theme">&#x1F319;</button>
+    </div>
+  </div>
+
+  <!-- Transcript -->
+  <div class="transcript" id="transcript"></div>
+
+  <!-- Controls -->
+  <div class="controls-wrapper">
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-info">
+        <span id="currentPos">0 / 0</span>
+        <span id="segmentCount"></span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl-btn small" id="skipStartBtn" title="Back to start">&#x23EE;</button>
+      <button class="ctrl-btn medium" id="prevBtn" title="Previous (Left arrow)">&#x23EA;</button>
+      <button class="ctrl-btn play" id="playBtn" title="Play/Pause (Space)">&#x25B6;</button>
+      <button class="ctrl-btn medium" id="nextBtn" title="Next (Right arrow)">&#x23E9;</button>
+      <button class="ctrl-btn small" id="skipEndBtn" title="Skip to end">&#x23ED;</button>
+      <button class="ctrl-btn small" id="bookmarkBtn" title="Bookmark (B)">&#x1F4CC;</button>
+    </div>
+
+    <div class="speed-control">
+      <span class="speed-label" id="speedDown" title="Slower">-</span>
+      <input type="range" class="speed-slider" id="speedSlider" min="0.5" max="3" step="0.25" value="1">
+      <span class="speed-label" id="speedUp" title="Faster">+</span>
+      <span class="speed-label" id="speedValue">1x</span>
+    </div>
+
+    <div class="shortcuts-hint">
+      <kbd>Space</kbd> Play &nbsp; <kbd>&larr;</kbd><kbd>&rarr;</kbd> Nav &nbsp; <kbd>B</kbd> Bookmark &nbsp; <kbd>+</kbd><kbd>-</kbd> Speed
+    </div>
+  </div>
+
+  <!-- Import overlay -->
+  <div class="import-overlay" id="importOverlay">
+    <div class="import-modal">
+      <h2>Import Document</h2>
+      <p>Drop a .txt or .docx file, or paste text directly</p>
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-icon">&#x1F4C4;</div>
+        <div class="drop-zone-text">Drop file here or click to browse</div>
+        <input type="file" id="fileInput" accept=".txt,.docx,.json" hidden>
+      </div>
+      <button class="modal-close" id="importClose">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Bookmarks panel -->
+  <div class="bookmarks-panel" id="bookmarksPanel">
+    <h3>Bookmarks</h3>
+    <div id="bookmarksList"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== App State =====
+    const state = {
+      segments: [],
+      currentSegment: 0,
+      currentSentence: 0,
+      isPlaying: false,
+      speed: 1,
+      bookmarks: new Set(),
+      speakers: {},
+      utterance: null,
+      voices: [],
+      selectedVoiceURI: null,
+    };
+
+    // ===== DOM Elements =====
+    const $ = id => document.getElementById(id);
+    const transcript = $('transcript');
+    const playBtn = $('playBtn');
+    const prevBtn = $('prevBtn');
+    const nextBtn = $('nextBtn');
+    const skipStartBtn = $('skipStartBtn');
+    const skipEndBtn = $('skipEndBtn');
+    const bookmarkBtn = $('bookmarkBtn');
+    const progressFill = $('progressFill');
+    const currentPos = $('currentPos');
+    const segmentCount = $('segmentCount');
+    const speedSlider = $('speedSlider');
+    const speedValue = $('speedValue');
+    const themeBtn = $('themeBtn');
+    const importBtn = $('importBtn');
+    const importOverlay = $('importOverlay');
+    const importClose = $('importClose');
+    const dropZone = $('dropZone');
+    const fileInput = $('fileInput');
+    const bookmarkListBtn = $('bookmarkListBtn');
+    const bookmarksPanel = $('bookmarksPanel');
+    const bookmarksList = $('bookmarksList');
+    const toast = $('toast');
+    const voiceSelect = $('voiceSelect');
+    const progressContainer = $('progressContainer');
+
+    // ===== Speech Synthesis =====
+    const synth = window.speechSynthesis;
+
+    function loadVoices() {
+      state.voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+      voiceSelect.innerHTML = '';
+      state.voices.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = v.voiceURI;
+        opt.textContent = v.name.replace(/Microsoft |Google |Amazon |Apple /, '').substring(0, 20);
+        if (v.default) opt.selected = true;
+        voiceSelect.appendChild(opt);
+      });
+      // Restore saved voice
+      const saved = localStorage.getItem('ra-voice');
+      if (saved) {
+        voiceSelect.value = saved;
+        state.selectedVoiceURI = saved;
+      }
+    }
+
+    synth.onvoiceschanged = loadVoices;
+    loadVoices();
+
+    voiceSelect.addEventListener('change', () => {
+      state.selectedVoiceURI = voiceSelect.value;
+      localStorage.setItem('ra-voice', voiceSelect.value);
+      if (state.isPlaying) {
+        stopSpeaking();
+        speakCurrent();
+      }
+    });
+
+    // ===== Split text into sentences =====
+    function splitSentences(text) {
+      // Split on sentence-ending punctuation followed by space or end
+      const sentences = text.match(/[^.!?]*[.!?]+[\s]?|[^.!?]+$/g);
+      return sentences ? sentences.map(s => s.trim()).filter(Boolean) : [text];
+    }
+
+    // ===== Render transcript =====
+    function render() {
+      transcript.innerHTML = '';
+      if (state.segments.length === 0) {
+        transcript.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F4D6;</div>
+            <h2>No Document Loaded</h2>
+            <p>Import a .txt or .docx file to get started</p>
+          </div>`;
+        return;
+      }
+
+      // Assign speaker colors
+      const speakerSet = [...new Set(state.segments.map(s => s.speaker))];
+      speakerSet.forEach((s, i) => state.speakers[s] = i < 2 ? i + 1 : ((i % 2) + 1));
+
+      state.segments.forEach((seg, i) => {
+        const div = document.createElement('div');
+        div.className = `segment speaker-${state.speakers[seg.speaker] || 1}`;
+        if (state.bookmarks.has(i)) div.classList.add('bookmarked');
+        div.dataset.index = i;
+
+        const sentences = splitSentences(seg.text);
+
+        div.innerHTML = `
+          <div class="segment-header">
+            <span class="speaker-name">${seg.speaker || 'Narrator'}</span>
+            ${seg.timestamp ? `<span class="timestamp">${seg.timestamp}</span>` : ''}
+          </div>
+          <div class="segment-text">
+            ${sentences.map((s, si) => `<span class="sentence" data-si="${si}">${escapeHtml(s)}</span>`).join(' ')}
+          </div>`;
+
+        div.addEventListener('click', () => {
+          goToSegment(i);
+          if (state.isPlaying) {
+            stopSpeaking();
+            speakCurrent();
+          }
+        });
+
+        transcript.appendChild(div);
+      });
+
+      updateUI();
+    }
+
+    function escapeHtml(text) {
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    // ===== Update UI state =====
+    function updateUI() {
+      // Highlight active segment
+      document.querySelectorAll('.segment').forEach((el, i) => {
+        el.classList.toggle('active', i === state.currentSegment);
+      });
+
+      // Highlight current sentence within active segment
+      const activeEl = document.querySelector('.segment.active');
+      if (activeEl) {
+        activeEl.querySelectorAll('.sentence').forEach((el, i) => {
+          el.classList.toggle('current-sentence', i === state.currentSentence);
+        });
+      }
+
+      // Progress
+      const total = state.segments.length;
+      const pct = total > 0 ? ((state.currentSegment + 1) / total) * 100 : 0;
+      progressFill.style.width = pct + '%';
+      currentPos.textContent = `${state.currentSegment + 1} / ${total}`;
+      segmentCount.textContent = `${total} segments`;
+
+      // Play button
+      playBtn.innerHTML = state.isPlaying ? '&#x23F8;' : '&#x25B6;';
+
+      // Auto-scroll to active
+      const active = document.querySelector('.segment.active');
+      if (active) {
+        active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // Save position
+      localStorage.setItem('ra-position', state.currentSegment);
+    }
+
+    // ===== Navigation =====
+    function goToSegment(index) {
+      if (index < 0) index = 0;
+      if (index >= state.segments.length) index = state.segments.length - 1;
+      state.currentSegment = index;
+      state.currentSentence = 0;
+      updateUI();
+    }
+
+    function nextSegment() {
+      if (state.currentSegment < state.segments.length - 1) {
+        goToSegment(state.currentSegment + 1);
+        if (state.isPlaying) {
+          stopSpeaking();
+          speakCurrent();
+        }
+      } else {
+        pause();
+      }
+    }
+
+    function prevSegment() {
+      goToSegment(state.currentSegment - 1);
+      if (state.isPlaying) {
+        stopSpeaking();
+        speakCurrent();
+      }
+    }
+
+    // ===== Speaking =====
+    function speakCurrent() {
+      if (state.currentSegment >= state.segments.length) return;
+
+      const seg = state.segments[state.currentSegment];
+      const sentences = splitSentences(seg.text);
+
+      speakSentence(sentences, state.currentSentence);
+    }
+
+    function speakSentence(sentences, sentenceIndex) {
+      if (sentenceIndex >= sentences.length) {
+        // Move to next segment
+        if (state.currentSegment < state.segments.length - 1) {
+          state.currentSegment++;
+          state.currentSentence = 0;
+          updateUI();
+          speakCurrent();
+        } else {
+          pause();
+        }
+        return;
+      }
+
+      state.currentSentence = sentenceIndex;
+
+      // Update sentence highlighting
+      const activeEl = document.querySelector('.segment.active');
+      if (activeEl) {
+        activeEl.querySelectorAll('.sentence').forEach((el, i) => {
+          el.classList.toggle('current-sentence', i === sentenceIndex);
+        });
+      }
+
+      const utter = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
+      utter.rate = state.speed;
+
+      // Set voice
+      if (state.selectedVoiceURI) {
+        const voice = state.voices.find(v => v.voiceURI === state.selectedVoiceURI);
+        if (voice) utter.voice = voice;
+      }
+
+      utter.onend = () => {
+        if (state.isPlaying) {
+          speakSentence(sentences, sentenceIndex + 1);
+        }
+      };
+
+      utter.onerror = (e) => {
+        if (e.error !== 'canceled' && state.isPlaying) {
+          speakSentence(sentences, sentenceIndex + 1);
+        }
+      };
+
+      state.utterance = utter;
+      synth.speak(utter);
+    }
+
+    function stopSpeaking() {
+      synth.cancel();
+      state.utterance = null;
+    }
+
+    function play() {
+      state.isPlaying = true;
+      updateUI();
+      speakCurrent();
+    }
+
+    function pause() {
+      state.isPlaying = false;
+      stopSpeaking();
+      updateUI();
+    }
+
+    function togglePlay() {
+      if (state.isPlaying) pause();
+      else play();
+    }
+
+    // ===== Speed =====
+    function setSpeed(val) {
+      state.speed = Math.max(0.5, Math.min(3, val));
+      speedSlider.value = state.speed;
+      speedValue.textContent = state.speed + 'x';
+      localStorage.setItem('ra-speed', state.speed);
+
+      if (state.isPlaying && state.utterance) {
+        stopSpeaking();
+        speakCurrent();
+      }
+    }
+
+    // ===== Bookmarks =====
+    function toggleBookmark() {
+      const idx = state.currentSegment;
+      if (state.bookmarks.has(idx)) {
+        state.bookmarks.delete(idx);
+        showToast('Bookmark removed');
+      } else {
+        state.bookmarks.add(idx);
+        showToast('Bookmarked!');
+      }
+      localStorage.setItem('ra-bookmarks', JSON.stringify([...state.bookmarks]));
+      // Update bookmarked class
+      const segEl = document.querySelectorAll('.segment')[idx];
+      if (segEl) segEl.classList.toggle('bookmarked', state.bookmarks.has(idx));
+      renderBookmarks();
+    }
+
+    function renderBookmarks() {
+      bookmarksList.innerHTML = '';
+      if (state.bookmarks.size === 0) {
+        bookmarksList.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No bookmarks yet. Press B or tap the pin to bookmark.</p>';
+        return;
+      }
+      [...state.bookmarks].sort((a, b) => a - b).forEach(idx => {
+        const seg = state.segments[idx];
+        if (!seg) return;
+        const div = document.createElement('div');
+        div.className = 'bookmark-item';
+        div.innerHTML = `
+          <div class="bm-speaker" style="color:var(--speaker-${state.speakers[seg.speaker] || 1})">${seg.speaker} ${seg.timestamp || ''}</div>
+          <div class="bm-text">${escapeHtml(seg.text)}</div>`;
+        div.addEventListener('click', () => {
+          goToSegment(idx);
+          bookmarksPanel.classList.remove('show');
+        });
+        bookmarksList.appendChild(div);
+      });
+    }
+
+    // ===== Toast =====
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    // ===== Theme =====
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      themeBtn.innerHTML = isLight ? '&#x2600;' : '&#x1F319;';
+      localStorage.setItem('ra-theme', isLight ? 'light' : 'dark');
+    }
+
+    // ===== Import =====
+    function showImport() { importOverlay.classList.add('show'); }
+    function hideImport() { importOverlay.classList.remove('show'); }
+
+    function handleFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'json') {
+        file.text().then(text => {
+          try {
+            const data = JSON.parse(text);
+            if (Array.isArray(data)) {
+              loadSegments(data);
+              hideImport();
+            }
+          } catch(e) { showToast('Invalid JSON'); }
+        });
+      } else if (ext === 'txt') {
+        file.text().then(text => {
+          const segments = text.split('\n').filter(l => l.trim()).map(line => {
+            // Try to parse "Speaker | timestamp\ntext" format
+            const match = line.match(/^(.+?)\s*\|\s*(\d+:\d+)\s*$/);
+            if (match) return { speaker: match[1], timestamp: match[2], text: '' };
+            return { speaker: '', timestamp: '', text: line };
+          });
+          // Merge: assign speaker headers to their text
+          const merged = [];
+          for (let i = 0; i < segments.length; i++) {
+            if (segments[i].speaker && !segments[i].text && segments[i+1]) {
+              segments[i+1].speaker = segments[i].speaker;
+              segments[i+1].timestamp = segments[i].timestamp;
+            } else if (segments[i].text) {
+              merged.push(segments[i]);
+            }
+          }
+          loadSegments(merged.length ? merged : segments.filter(s => s.text));
+          hideImport();
+        });
+      } else {
+        showToast('Supported: .txt, .json');
+      }
+    }
+
+    // ===== Load segments =====
+    function loadSegments(segments) {
+      state.segments = segments;
+      state.currentSegment = 0;
+      state.currentSentence = 0;
+      state.bookmarks.clear();
+      pause();
+      render();
+      showToast(`Loaded ${segments.length} segments`);
+      localStorage.setItem('ra-segments', JSON.stringify(segments));
+    }
+
+    // ===== Progress click =====
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      const idx = Math.floor(pct * state.segments.length);
+      goToSegment(idx);
+      if (state.isPlaying) {
+        stopSpeaking();
+        speakCurrent();
+      }
+    });
+
+    // ===== Event Listeners =====
+    playBtn.addEventListener('click', togglePlay);
+    nextBtn.addEventListener('click', nextSegment);
+    prevBtn.addEventListener('click', prevSegment);
+    skipStartBtn.addEventListener('click', () => goToSegment(0));
+    skipEndBtn.addEventListener('click', () => goToSegment(state.segments.length - 1));
+    bookmarkBtn.addEventListener('click', toggleBookmark);
+
+    speedSlider.addEventListener('input', () => setSpeed(parseFloat(speedSlider.value)));
+    $('speedDown').addEventListener('click', () => setSpeed(state.speed - 0.25));
+    $('speedUp').addEventListener('click', () => setSpeed(state.speed + 0.25));
+    $('speedValue').addEventListener('click', () => setSpeed(1)); // Reset to 1x
+
+    themeBtn.addEventListener('click', toggleTheme);
+    importBtn.addEventListener('click', showImport);
+    importClose.addEventListener('click', hideImport);
+    importOverlay.addEventListener('click', (e) => { if (e.target === importOverlay) hideImport(); });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+    bookmarkListBtn.addEventListener('click', () => {
+      bookmarksPanel.classList.toggle('show');
+      renderBookmarks();
+    });
+
+    // Close bookmarks on outside click
+    document.addEventListener('click', (e) => {
+      if (bookmarksPanel.classList.contains('show') &&
+          !bookmarksPanel.contains(e.target) &&
+          e.target !== bookmarkListBtn) {
+        bookmarksPanel.classList.remove('show');
+      }
+    });
+
+    // ===== Keyboard Shortcuts =====
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+      switch(e.code) {
+        case 'Space':
+          e.preventDefault();
+          togglePlay();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          nextSegment();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          prevSegment();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSpeed(state.speed + 0.25);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          setSpeed(state.speed - 0.25);
+          break;
+        case 'KeyB':
+          toggleBookmark();
+          break;
+        case 'KeyM':
+          toggleTheme();
+          break;
+        case 'Equal':
+        case 'NumpadAdd':
+          setSpeed(state.speed + 0.25);
+          break;
+        case 'Minus':
+        case 'NumpadSubtract':
+          setSpeed(state.speed - 0.25);
+          break;
+        case 'Home':
+          goToSegment(0);
+          break;
+        case 'End':
+          goToSegment(state.segments.length - 1);
+          break;
+      }
+    });
+
+    // ===== Touch swipe support =====
+    let touchStartX = 0;
+    transcript.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    transcript.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(diff) > 80) {
+        if (diff > 0) prevSegment();
+        else nextSegment();
+      }
+    }, { passive: true });
+
+    // ===== Init =====
+    function init() {
+      // Restore theme
+      const savedTheme = localStorage.getItem('ra-theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light');
+        themeBtn.innerHTML = '&#x2600;';
+      }
+
+      // Restore speed
+      const savedSpeed = localStorage.getItem('ra-speed');
+      if (savedSpeed) setSpeed(parseFloat(savedSpeed));
+
+      // Try to load saved segments or fetch default
+      const savedSegments = localStorage.getItem('ra-segments');
+      if (savedSegments) {
+        try {
+          state.segments = JSON.parse(savedSegments);
+        } catch(e) {}
+      }
+
+      if (state.segments.length === 0) {
+        // Try to load the default transcript
+        fetch('transcript.json')
+          .then(r => r.json())
+          .then(data => {
+            state.segments = data;
+            localStorage.setItem('ra-segments', JSON.stringify(data));
+            finishInit();
+          })
+          .catch(() => finishInit());
+      } else {
+        finishInit();
+      }
+    }
+
+    function finishInit() {
+      // Restore bookmarks
+      const savedBookmarks = localStorage.getItem('ra-bookmarks');
+      if (savedBookmarks) {
+        try {
+          JSON.parse(savedBookmarks).forEach(b => state.bookmarks.add(b));
+        } catch(e) {}
+      }
+
+      // Restore position
+      const savedPos = localStorage.getItem('ra-position');
+      if (savedPos) state.currentSegment = Math.min(parseInt(savedPos) || 0, state.segments.length - 1);
+
+      render();
+    }
+
+    // Keep synth alive (Chrome bug workaround)
+    setInterval(() => {
+      if (state.isPlaying && synth.speaking) {
+        synth.pause();
+        synth.resume();
+      }
+    }, 10000);
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    init();
+  </script>
+</body>
+</html>
