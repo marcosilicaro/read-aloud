@@ -3,80 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1a1a2e">
+  <meta name="theme-color" content="#121218">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Read Aloud</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔊</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4D6;</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,500;7..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* ===== Theme system ===== */
     :root {
-      --bg: #0f0f1a;
-      --surface: #1a1a2e;
-      --surface-hover: #252540;
-      --text: #e0e0e0;
-      --text-muted: #888;
-      --accent: #7c5cfc;
-      --accent-glow: rgba(124, 92, 252, 0.3);
-      --speaker-1: #7c5cfc;
-      --speaker-2: #00c9a7;
-      --highlight-bg: rgba(124, 92, 252, 0.15);
-      --highlight-border: #7c5cfc;
-      --radius: 12px;
-      --shadow: 0 4px 20px rgba(0,0,0,0.3);
+      --bg: #121218;
+      --surface: #1c1c26;
+      --surface-2: #242430;
+      --surface-hover: #2a2a38;
+      --text: #d8d8e0;
+      --text-secondary: #9898a8;
+      --text-muted: #606070;
+      --accent: #7c6cfc;
+      --accent-soft: rgba(124, 108, 252, 0.15);
+      --accent-glow: rgba(124, 108, 252, 0.35);
+      --highlight: rgba(124, 108, 252, 0.22);
+      --speaker-1: #7c6cfc;
+      --speaker-2: #3ecfb0;
+      --speaker-3: #f0a060;
+      --speaker-4: #e06090;
+      --danger: #f06060;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.4);
+      --font-body: 'Literata', Georgia, serif;
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-size: 16px;
+      --line-height: 1.75;
     }
 
-    .light {
-      --bg: #f5f5f8;
+    [data-theme="light"] {
+      --bg: #f8f6f2;
       --surface: #ffffff;
-      --surface-hover: #f0f0f5;
-      --text: #1a1a2e;
-      --text-muted: #666;
-      --accent: #6c4ce6;
-      --accent-glow: rgba(108, 76, 230, 0.2);
-      --speaker-1: #6c4ce6;
-      --speaker-2: #00a88a;
-      --highlight-bg: rgba(108, 76, 230, 0.1);
-      --highlight-border: #6c4ce6;
-      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --surface-2: #f0ede8;
+      --surface-hover: #e8e5e0;
+      --text: #2a2824;
+      --text-secondary: #5a5850;
+      --text-muted: #908880;
+      --accent: #6050d8;
+      --accent-soft: rgba(96, 80, 216, 0.1);
+      --accent-glow: rgba(96, 80, 216, 0.25);
+      --highlight: rgba(96, 80, 216, 0.12);
+      --shadow: 0 8px 32px rgba(0,0,0,0.06);
+    }
+
+    [data-theme="sepia"] {
+      --bg: #f4ead5;
+      --surface: #faf3e4;
+      --surface-2: #efe5cf;
+      --surface-hover: #e8ddc5;
+      --text: #3d3428;
+      --text-secondary: #6a5d4e;
+      --text-muted: #9a8d7e;
+      --accent: #a07040;
+      --accent-soft: rgba(160, 112, 64, 0.12);
+      --accent-glow: rgba(160, 112, 64, 0.25);
+      --highlight: rgba(160, 112, 64, 0.15);
+      --shadow: 0 8px 32px rgba(80,60,20,0.08);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: var(--font-ui);
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.4s ease, color 0.4s ease;
       -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
     }
 
-    /* Header */
+    /* ===== Header ===== */
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 20px;
+      padding: 10px 20px;
       background: var(--surface);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      position: sticky;
-      top: 0;
+      border-bottom: 1px solid rgba(128,128,128,0.1);
       z-index: 100;
-      backdrop-filter: blur(10px);
+      flex-shrink: 0;
     }
 
-    .header h1 {
-      font-size: 18px;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-left h1 {
+      font-size: 17px;
       font-weight: 600;
       letter-spacing: -0.3px;
     }
 
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 4px;
       align-items: center;
     }
 
@@ -85,127 +117,174 @@
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 8px;
-      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 16px;
+      position: relative;
     }
 
     .icon-btn:hover { background: var(--surface-hover); color: var(--text); }
     .icon-btn.active { color: var(--accent); }
 
-    /* Transcript area */
-    .transcript {
+    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Badge */
+    .badge {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: none;
+    }
+    .badge.show { display: block; }
+
+    /* ===== Main reading area ===== */
+    .reader {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 20px;
-      padding-bottom: 220px;
+      overflow-x: hidden;
       scroll-behavior: smooth;
+      overscroll-behavior: contain;
     }
 
-    .segment {
-      padding: 12px 16px;
-      margin-bottom: 8px;
+    .reader-content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      padding-bottom: 280px;
+    }
+
+    /* ===== Segment (paragraph) ===== */
+    .seg {
+      margin-bottom: 20px;
+      padding: 14px 18px;
       border-radius: var(--radius);
       border-left: 3px solid transparent;
-      transition: all 0.3s ease;
+      transition: all 0.35s ease;
       cursor: pointer;
       position: relative;
     }
 
-    .segment:hover { background: var(--surface-hover); }
+    .seg:hover { background: var(--accent-soft); }
 
-    .segment.active {
-      background: var(--highlight-bg);
-      border-left-color: var(--highlight-border);
-      box-shadow: var(--shadow);
+    .seg.active {
+      background: var(--highlight);
+      border-left-color: var(--accent);
     }
 
-    .segment.active .segment-text .current-sentence {
-      background: rgba(124, 92, 252, 0.25);
-      border-radius: 4px;
-      padding: 1px 2px;
-    }
-
-    .light .segment.active .segment-text .current-sentence {
-      background: rgba(108, 76, 230, 0.18);
-    }
-
-    .segment-header {
+    .seg-speaker {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 6px;
     }
 
-    .speaker-name {
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .speaker-1 .speaker-name { color: var(--speaker-1); }
-    .speaker-2 .speaker-name { color: var(--speaker-2); }
-
-    .timestamp {
-      font-size: 11px;
-      color: var(--text-muted);
+    .seg-speaker .ts {
+      font-weight: 400;
+      opacity: 0.5;
       font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
     }
 
-    .segment-text {
-      font-size: 15px;
-      line-height: 1.65;
+    .seg-body {
+      font-family: var(--font-body);
+      font-size: var(--font-size);
+      line-height: var(--line-height);
       color: var(--text);
     }
 
-    /* Bookmark indicator */
-    .segment.bookmarked::after {
+    .seg-body .sentence {
+      transition: background 0.25s, color 0.15s;
+      border-radius: 3px;
+      padding: 0 1px;
+    }
+
+    .seg.active .sentence.current {
+      background: var(--accent-glow);
+    }
+
+    /* Bookmark dot */
+    .seg.bookmarked::before {
       content: '';
       position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 8px;
-      height: 8px;
+      top: 10px;
+      right: 10px;
+      width: 7px;
+      height: 7px;
       background: var(--accent);
       border-radius: 50%;
     }
 
-    /* Controls */
+    /* Chapter divider */
+    .chapter-divider {
+      text-align: center;
+      padding: 28px 0 20px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    .chapter-divider::before,
+    .chapter-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 60px;
+      height: 1px;
+      background: var(--text-muted);
+      opacity: 0.3;
+    }
+    .chapter-divider::before { right: calc(50% + 60px); }
+    .chapter-divider::after { left: calc(50% + 60px); }
+
+    /* ===== Controls wrapper ===== */
     .controls-wrapper {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       background: var(--surface);
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding: 0 20px 20px;
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(128,128,128,0.1);
       z-index: 100;
-      backdrop-filter: blur(20px);
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      transition: background 0.4s ease;
     }
 
     /* Progress bar */
-    .progress-container {
+    .progress-bar {
       width: 100%;
-      padding: 12px 0 8px;
+      height: 32px;
+      padding: 12px 20px 0;
       cursor: pointer;
+      display: flex;
+      align-items: flex-start;
     }
 
     .progress-track {
       width: 100%;
       height: 4px;
-      background: rgba(255,255,255,0.1);
+      background: var(--surface-2);
       border-radius: 2px;
       position: relative;
       transition: height 0.15s;
     }
 
-    .progress-container:hover .progress-track { height: 6px; }
+    .progress-bar:hover .progress-track { height: 6px; }
 
     .progress-fill {
       height: 100%;
@@ -218,41 +297,41 @@
     .progress-fill::after {
       content: '';
       position: absolute;
-      right: -6px;
+      right: -7px;
       top: 50%;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
+      transform: translateY(-50%) scale(0);
+      width: 14px;
+      height: 14px;
       background: var(--accent);
       border-radius: 50%;
-      opacity: 0;
-      transition: opacity 0.15s;
+      transition: transform 0.15s;
+      box-shadow: 0 0 8px var(--accent-glow);
     }
 
-    .progress-container:hover .progress-fill::after { opacity: 1; }
+    .progress-bar:hover .progress-fill::after { transform: translateY(-50%) scale(1); }
 
-    .progress-info {
+    .progress-meta {
       display: flex;
       justify-content: space-between;
+      padding: 4px 20px 0;
       font-size: 11px;
       color: var(--text-muted);
-      margin-top: 4px;
       font-variant-numeric: tabular-nums;
     }
 
-    /* Main controls row */
+    /* Main controls */
     .controls {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      padding: 8px 0;
+      gap: 8px;
+      padding: 8px 0 4px;
     }
 
-    .ctrl-btn {
+    .ctrl {
       background: none;
       border: none;
-      color: var(--text);
+      color: var(--text-secondary);
       cursor: pointer;
       border-radius: 50%;
       display: flex;
@@ -261,187 +340,396 @@
       transition: all 0.2s;
     }
 
-    .ctrl-btn:hover { transform: scale(1.1); }
-    .ctrl-btn:active { transform: scale(0.95); }
+    .ctrl:hover { color: var(--text); transform: scale(1.08); }
+    .ctrl:active { transform: scale(0.94); }
 
-    .ctrl-btn.small { width: 40px; height: 40px; font-size: 20px; }
-    .ctrl-btn.medium { width: 48px; height: 48px; font-size: 22px; }
+    .ctrl svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .ctrl-btn.play {
+    .ctrl.sm { width: 36px; height: 36px; }
+    .ctrl.sm svg { width: 18px; height: 18px; }
+
+    .ctrl.md { width: 44px; height: 44px; }
+    .ctrl.md svg { width: 22px; height: 22px; }
+
+    .ctrl.play-btn {
       width: 56px;
       height: 56px;
       background: var(--accent);
       color: white;
-      font-size: 24px;
-      box-shadow: 0 4px 16px var(--accent-glow);
+      box-shadow: 0 4px 20px var(--accent-glow);
     }
 
-    .ctrl-btn.play:hover {
-      box-shadow: 0 6px 24px var(--accent-glow);
-    }
+    .ctrl.play-btn:hover { box-shadow: 0 6px 28px var(--accent-glow); }
+    .ctrl.play-btn svg { width: 24px; height: 24px; fill: white; stroke: white; }
 
-    /* Speed control */
-    .speed-control {
+    /* Speed / sleep / font row */
+    .controls-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
       justify-content: center;
-      padding: 4px 0;
+      gap: 20px;
+      padding: 4px 0 4px;
     }
 
-    .speed-label {
+    .meta-chip {
       font-size: 12px;
+      font-weight: 500;
       color: var(--text-muted);
-      min-width: 40px;
-      text-align: center;
-      font-weight: 600;
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
+      border: none;
+      background: none;
       transition: all 0.2s;
+      font-family: var(--font-ui);
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .speed-label:hover { background: var(--surface-hover); color: var(--text); }
+    .meta-chip:hover { background: var(--surface-hover); color: var(--text); }
+    .meta-chip.active { color: var(--accent); }
 
-    .speed-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 120px;
-      height: 4px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-      outline: none;
+    .meta-chip svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Keyboard hint */
+    .kb-hint {
+      text-align: center;
+      padding: 2px 0 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      opacity: 0.6;
     }
 
-    .speed-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      background: var(--accent);
-      border-radius: 50%;
-      cursor: pointer;
+    .kb-hint kbd {
+      background: var(--surface-2);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: var(--font-ui);
+      font-size: 9px;
     }
 
-    /* Import overlay */
-    .import-overlay {
+    /* ===== Panels (TOC, Bookmarks, Settings, Search) ===== */
+    .panel-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.5);
       z-index: 200;
-      align-items: center;
-      justify-content: center;
       backdrop-filter: blur(4px);
     }
 
-    .import-overlay.show { display: flex; }
+    .panel-overlay.show { display: block; }
 
-    .import-modal {
-      background: var(--surface);
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 420px;
-      width: 90%;
-      text-align: center;
-    }
-
-    .import-modal h2 { margin-bottom: 16px; font-size: 20px; }
-    .import-modal p { color: var(--text-muted); margin-bottom: 20px; font-size: 14px; }
-
-    .drop-zone {
-      border: 2px dashed rgba(124, 92, 252, 0.4);
-      border-radius: var(--radius);
-      padding: 40px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 12px;
-    }
-
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--accent);
-      background: var(--highlight-bg);
-    }
-
-    .drop-zone-icon { font-size: 36px; margin-bottom: 8px; }
-    .drop-zone-text { font-size: 14px; color: var(--text-muted); }
-
-    .modal-close {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: var(--text-muted);
-      padding: 8px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .modal-close:hover { background: var(--surface-hover); color: var(--text); }
-
-    /* Bookmarks panel */
-    .bookmarks-panel {
-      display: none;
+    .panel {
       position: fixed;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 300px;
-      max-width: 85vw;
+      z-index: 201;
       background: var(--surface);
-      z-index: 150;
-      padding: 20px;
       overflow-y: auto;
-      box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
     }
 
-    .bookmarks-panel.show { display: block; }
+    .panel-right {
+      top: 0; right: 0; bottom: 0;
+      width: 320px;
+      max-width: 88vw;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.3);
+      transform: translateX(100%);
+    }
 
-    .bookmarks-panel h3 { margin-bottom: 16px; font-size: 16px; }
+    .panel-right.show { transform: translateX(0); }
 
-    .bookmark-item {
+    .panel-top {
+      top: 0; left: 0; right: 0;
+      max-height: 70vh;
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      transform: translateY(-100%);
+    }
+
+    .panel-top.show { transform: translateY(0); }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(128,128,128,0.1);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+
+    .panel-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .panel-body { padding: 12px 16px; }
+
+    /* TOC items */
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       padding: 10px 12px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      margin-bottom: 6px;
       transition: background 0.2s;
       font-size: 13px;
     }
 
-    .bookmark-item:hover { background: var(--surface-hover); }
-    .bookmark-item .bm-speaker { font-weight: 600; font-size: 11px; text-transform: uppercase; }
-    .bookmark-item .bm-text { color: var(--text-muted); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .toc-item:hover { background: var(--surface-hover); }
+    .toc-item.current { color: var(--accent); font-weight: 500; }
 
-    /* Keyboard shortcuts help */
-    .shortcuts-hint {
+    .toc-num {
       font-size: 11px;
       color: var(--text-muted);
+      min-width: 24px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toc-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Bookmark items */
+    .bm-item {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 4px;
+    }
+
+    .bm-item:hover { background: var(--surface-hover); }
+    .bm-item-speaker { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .bm-item-text { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .bm-item-remove { float: right; cursor: pointer; color: var(--text-muted); font-size: 12px; padding: 2px 6px; border-radius: 4px; }
+    .bm-item-remove:hover { background: rgba(240,96,96,0.15); color: var(--danger); }
+
+    /* Settings panel */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(128,128,128,0.06);
+    }
+
+    .setting-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .setting-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover { transform: scale(1.1); }
+    .theme-btn.active { border-color: var(--accent); }
+    .theme-btn[data-t="dark"] { background: #1c1c26; }
+    .theme-btn[data-t="light"] { background: #f8f6f2; }
+    .theme-btn[data-t="sepia"] { background: #f4ead5; }
+
+    .font-btn {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(128,128,128,0.2);
+      background: none;
+      color: var(--text);
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .font-btn:hover { background: var(--surface-hover); }
+
+    .font-size-label {
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      min-width: 36px;
       text-align: center;
-      padding: 4px 0;
     }
 
-    .shortcuts-hint kbd {
-      background: var(--surface-hover);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-family: inherit;
+    /* Speed picker */
+    .speed-picker {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      padding: 8px 0;
     }
 
-    /* Toast notification */
+    .speed-opt {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(128,128,128,0.15);
+      background: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--font-ui);
+      transition: all 0.2s;
+    }
+
+    .speed-opt:hover { background: var(--surface-hover); }
+    .speed-opt.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+    /* Sleep timer display */
+    .sleep-display {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sleep-opt {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(128,128,128,0.15);
+      background: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: var(--font-ui);
+      transition: all 0.2s;
+    }
+
+    .sleep-opt:hover { background: var(--surface-hover); }
+    .sleep-opt.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+    /* Search */
+    .search-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(128,128,128,0.15);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-ui);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .search-results { margin-top: 12px; }
+
+    .search-result {
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .search-result:hover { background: var(--surface-hover); }
+    .search-result mark { background: var(--accent-soft); color: var(--accent); border-radius: 2px; padding: 0 2px; }
+    .search-result .sr-speaker { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+    /* Voice selector */
+    .voice-select {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid rgba(128,128,128,0.15);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      width: 100%;
+      outline: none;
+    }
+
+    /* Import modal */
+    .import-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.6);
+      z-index: 300;
+      backdrop-filter: blur(4px);
+    }
+
+    .import-modal.show { display: flex; }
+
+    .import-box {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .import-box h2 { font-size: 18px; margin-bottom: 8px; }
+    .import-box p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+
+    .drop-zone {
+      border: 2px dashed rgba(128,128,128,0.2);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .drop-zone-icon { font-size: 32px; margin-bottom: 8px; }
+    .drop-zone-text { font-size: 13px; color: var(--text-muted); }
+
+    .import-cancel {
+      margin-top: 16px;
+      background: none;
+      border: 1px solid rgba(128,128,128,0.15);
+      color: var(--text-muted);
+      padding: 8px 24px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--font-ui);
+      transition: all 0.2s;
+    }
+
+    .import-cancel:hover { background: var(--surface-hover); color: var(--text); }
+
+    /* Toast */
     .toast {
       position: fixed;
-      bottom: 240px;
+      bottom: 260px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--surface);
+      transform: translateX(-50%) translateY(12px);
+      background: var(--surface-2);
       color: var(--text);
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
       font-size: 13px;
       box-shadow: var(--shadow);
       opacity: 0;
       transition: all 0.3s;
-      z-index: 300;
+      z-index: 400;
       pointer-events: none;
     }
 
@@ -453,664 +741,843 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 60vh;
+      min-height: 50vh;
       color: var(--text-muted);
       text-align: center;
-      padding: 20px;
+      padding: 40px 24px;
     }
 
-    .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
-    .empty-state h2 { margin-bottom: 8px; color: var(--text); }
-    .empty-state p { font-size: 14px; max-width: 300px; }
+    .empty-state svg { width: 64px; height: 64px; stroke: var(--text-muted); opacity: 0.4; margin-bottom: 20px; }
+    .empty-state h2 { color: var(--text-secondary); font-size: 18px; margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; max-width: 320px; }
+
+    /* Scrollbar */
+    .reader::-webkit-scrollbar { width: 5px; }
+    .reader::-webkit-scrollbar-track { background: transparent; }
+    .reader::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.15); border-radius: 3px; }
+    .reader::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.3); }
 
     /* Responsive */
     @media (max-width: 480px) {
-      .header { padding: 10px 16px; }
-      .transcript { padding: 12px 16px; }
-      .controls-wrapper { padding: 0 16px 16px; }
-      .shortcuts-hint { display: none; }
-      .segment-text { font-size: 14px; }
+      .header { padding: 8px 14px; }
+      .reader-content { padding: 20px 16px 280px; }
+      .kb-hint { display: none; }
+      .controls-meta { gap: 12px; }
     }
 
-    /* Scrollbar */
-    .transcript::-webkit-scrollbar { width: 6px; }
-    .transcript::-webkit-scrollbar-track { background: transparent; }
-    .transcript::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
-    /* Voice selector */
-    .voice-select {
-      background: var(--surface-hover);
-      color: var(--text);
-      border: none;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      max-width: 130px;
+    @media (min-width: 1024px) {
+      .reader-content { max-width: 720px; padding: 48px 32px 300px; }
     }
+
+    /* Sleep timer countdown */
+    .sleep-countdown {
+      font-size: 11px;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      margin-left: 4px;
+    }
+
+    /* Auto-highlight mode indicator */
+    .auto-scroll-indicator {
+      position: fixed;
+      top: 56px;
+      right: 20px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface);
+      padding: 4px 10px;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 99;
+      pointer-events: none;
+    }
+
+    .auto-scroll-indicator.show { opacity: 1; }
   </style>
 </head>
-<body>
+<body data-theme="dark">
 
   <!-- Header -->
   <div class="header">
-    <h1>Read Aloud</h1>
+    <div class="header-left">
+      <h1>Read Aloud</h1>
+    </div>
     <div class="header-actions">
-      <select class="voice-select" id="voiceSelect" title="Voice"></select>
-      <button class="icon-btn" id="importBtn" title="Import document">&#x1F4C2;</button>
-      <button class="icon-btn" id="bookmarkListBtn" title="Bookmarks">&#x1F516;</button>
-      <button class="icon-btn" id="themeBtn" title="Toggle theme">&#x1F319;</button>
+      <button class="icon-btn" id="searchBtn" title="Search (Ctrl+F)">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+      <button class="icon-btn" id="tocBtn" title="Table of Contents">
+        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      </button>
+      <button class="icon-btn" id="bookmarkListBtn" title="Bookmarks">
+        <svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="badge" id="bmBadge"></span>
+      </button>
+      <button class="icon-btn" id="importBtn" title="Import file">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
     </div>
   </div>
 
-  <!-- Transcript -->
-  <div class="transcript" id="transcript"></div>
+  <!-- Auto-scroll indicator -->
+  <div class="auto-scroll-indicator" id="autoScrollInd">Auto-scrolling</div>
+
+  <!-- Reading area -->
+  <div class="reader" id="reader">
+    <div class="reader-content" id="readerContent"></div>
+  </div>
 
   <!-- Controls -->
   <div class="controls-wrapper">
-    <div class="progress-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar">
       <div class="progress-track">
-        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
-      <div class="progress-info">
-        <span id="currentPos">0 / 0</span>
-        <span id="segmentCount"></span>
-      </div>
+    </div>
+    <div class="progress-meta">
+      <span id="posLabel">0 / 0</span>
+      <span id="etaLabel"></span>
     </div>
 
     <div class="controls">
-      <button class="ctrl-btn small" id="skipStartBtn" title="Back to start">&#x23EE;</button>
-      <button class="ctrl-btn medium" id="prevBtn" title="Previous (Left arrow)">&#x23EA;</button>
-      <button class="ctrl-btn play" id="playBtn" title="Play/Pause (Space)">&#x25B6;</button>
-      <button class="ctrl-btn medium" id="nextBtn" title="Next (Right arrow)">&#x23E9;</button>
-      <button class="ctrl-btn small" id="skipEndBtn" title="Skip to end">&#x23ED;</button>
-      <button class="ctrl-btn small" id="bookmarkBtn" title="Bookmark (B)">&#x1F4CC;</button>
+      <button class="ctrl sm" id="skipStartBtn" title="Start (Home)">
+        <svg viewBox="0 0 24 24"><polyline points="11 19 2 12 11 5"/><polyline points="22 19 13 12 22 5"/></svg>
+      </button>
+      <button class="ctrl md" id="prevBtn" title="Previous (Left)">
+        <svg viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+      </button>
+      <button class="ctrl play-btn" id="playBtn" title="Play / Pause (Space)">
+        <svg viewBox="0 0 24 24" id="playIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <button class="ctrl md" id="nextBtn" title="Next (Right)">
+        <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+      </button>
+      <button class="ctrl sm" id="skipEndBtn" title="End (End)">
+        <svg viewBox="0 0 24 24"><polyline points="13 19 22 12 13 5"/><polyline points="2 19 11 12 2 5"/></svg>
+      </button>
     </div>
 
-    <div class="speed-control">
-      <span class="speed-label" id="speedDown" title="Slower">-</span>
-      <input type="range" class="speed-slider" id="speedSlider" min="0.5" max="3" step="0.25" value="1">
-      <span class="speed-label" id="speedUp" title="Faster">+</span>
-      <span class="speed-label" id="speedValue">1x</span>
+    <div class="controls-meta">
+      <button class="meta-chip" id="speedChip" title="Playback speed">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" fill="currentColor" stroke="none"/><path d="M12 6v6l4 2" stroke-width="2"/></svg>
+        <span id="speedLabel">1x</span>
+      </button>
+      <button class="meta-chip" id="sleepChip" title="Sleep timer">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span id="sleepLabel">Sleep</span>
+      </button>
+      <button class="meta-chip" id="bookmarkChip" title="Bookmark (B)">
+        <svg viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span>Bookmark</span>
+      </button>
     </div>
 
-    <div class="shortcuts-hint">
-      <kbd>Space</kbd> Play &nbsp; <kbd>&larr;</kbd><kbd>&rarr;</kbd> Nav &nbsp; <kbd>B</kbd> Bookmark &nbsp; <kbd>+</kbd><kbd>-</kbd> Speed
+    <div class="kb-hint">
+      <kbd>Space</kbd> play &nbsp; <kbd>&larr;</kbd><kbd>&rarr;</kbd> nav &nbsp; <kbd>B</kbd> bookmark &nbsp; <kbd>&uarr;</kbd><kbd>&darr;</kbd> speed &nbsp; <kbd>/</kbd> search
     </div>
   </div>
 
-  <!-- Import overlay -->
-  <div class="import-overlay" id="importOverlay">
-    <div class="import-modal">
+  <!-- Overlay backdrop -->
+  <div class="panel-overlay" id="panelOverlay"></div>
+
+  <!-- TOC Panel -->
+  <div class="panel panel-right" id="tocPanel">
+    <div class="panel-header">
+      <h3>Table of Contents</h3>
+      <button class="icon-btn" id="tocClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="panel-body" id="tocBody"></div>
+  </div>
+
+  <!-- Bookmarks Panel -->
+  <div class="panel panel-right" id="bmPanel">
+    <div class="panel-header">
+      <h3>Bookmarks</h3>
+      <button class="icon-btn" id="bmClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="panel-body" id="bmBody"></div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="panel panel-right" id="settingsPanel">
+    <div class="panel-header">
+      <h3>Settings</h3>
+      <button class="icon-btn" id="settingsClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="panel-body">
+      <div class="setting-row">
+        <span class="setting-label">Theme</span>
+        <div class="setting-control">
+          <button class="theme-btn active" data-t="dark"></button>
+          <button class="theme-btn" data-t="light"></button>
+          <button class="theme-btn" data-t="sepia"></button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Font Size</span>
+        <div class="setting-control">
+          <button class="font-btn" id="fontDown">A-</button>
+          <span class="font-size-label" id="fontSizeLabel">16</span>
+          <button class="font-btn" id="fontUp">A+</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Voice</span>
+        <div class="setting-control" style="flex:1;margin-left:12px;">
+          <select class="voice-select" id="voiceSelect"></select>
+        </div>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <span class="setting-label">Speed</span>
+        <div class="speed-picker" id="speedPicker"></div>
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <span class="setting-label">Sleep Timer</span>
+        <div class="sleep-display" id="sleepPicker"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Panel -->
+  <div class="panel panel-top" id="searchPanel">
+    <div class="panel-header">
+      <h3>Search</h3>
+      <button class="icon-btn" id="searchClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="panel-body">
+      <input class="search-input" id="searchInput" placeholder="Search transcript..." autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="import-modal" id="importModal">
+    <div class="import-box">
       <h2>Import Document</h2>
-      <p>Drop a .txt or .docx file, or paste text directly</p>
+      <p>Drop a .txt, .json, or .docx file</p>
       <div class="drop-zone" id="dropZone">
         <div class="drop-zone-icon">&#x1F4C4;</div>
-        <div class="drop-zone-text">Drop file here or click to browse</div>
-        <input type="file" id="fileInput" accept=".txt,.docx,.json" hidden>
+        <div class="drop-zone-text">Drop here or tap to browse</div>
+        <input type="file" id="fileInput" accept=".txt,.json,.docx" hidden>
       </div>
-      <button class="modal-close" id="importClose">Cancel</button>
+      <button class="import-cancel" id="importCancel">Cancel</button>
     </div>
-  </div>
-
-  <!-- Bookmarks panel -->
-  <div class="bookmarks-panel" id="bookmarksPanel">
-    <h3>Bookmarks</h3>
-    <div id="bookmarksList"></div>
   </div>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
   <script>
-    // ===== App State =====
-    const state = {
+  (() => {
+    'use strict';
+
+    // ========== State ==========
+    const S = {
       segments: [],
-      currentSegment: 0,
-      currentSentence: 0,
-      isPlaying: false,
+      cur: 0,
+      curSentence: 0,
+      playing: false,
       speed: 1,
+      fontSize: 16,
+      theme: 'dark',
       bookmarks: new Set(),
       speakers: {},
-      utterance: null,
+      sleepTimer: null,
+      sleepEnd: 0,
+      sleepMinutes: 0,
+      voiceURI: null,
       voices: [],
-      selectedVoiceURI: null,
     };
 
-    // ===== DOM Elements =====
+    // ========== Helpers ==========
     const $ = id => document.getElementById(id);
-    const transcript = $('transcript');
-    const playBtn = $('playBtn');
-    const prevBtn = $('prevBtn');
-    const nextBtn = $('nextBtn');
-    const skipStartBtn = $('skipStartBtn');
-    const skipEndBtn = $('skipEndBtn');
-    const bookmarkBtn = $('bookmarkBtn');
-    const progressFill = $('progressFill');
-    const currentPos = $('currentPos');
-    const segmentCount = $('segmentCount');
-    const speedSlider = $('speedSlider');
-    const speedValue = $('speedValue');
-    const themeBtn = $('themeBtn');
-    const importBtn = $('importBtn');
-    const importOverlay = $('importOverlay');
-    const importClose = $('importClose');
-    const dropZone = $('dropZone');
-    const fileInput = $('fileInput');
-    const bookmarkListBtn = $('bookmarkListBtn');
-    const bookmarksPanel = $('bookmarksPanel');
-    const bookmarksList = $('bookmarksList');
-    const toast = $('toast');
-    const voiceSelect = $('voiceSelect');
-    const progressContainer = $('progressContainer');
-
-    // ===== Speech Synthesis =====
     const synth = window.speechSynthesis;
+    const SPEAKER_COLORS = ['speaker-1','speaker-2','speaker-3','speaker-4'];
+    const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+    const SLEEP_OPTIONS = [0, 5, 10, 15, 30, 45, 60, 90];
 
+    function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    function splitSentences(text) {
+      const m = text.match(/[^.!?]*[.!?]+[\s]?|[^.!?]+$/g);
+      return m ? m.map(s => s.trim()).filter(Boolean) : [text];
+    }
+
+    function showToast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._to);
+      t._to = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function save(k, v) { try { localStorage.setItem('ra2-' + k, typeof v === 'object' ? JSON.stringify(v) : v); } catch(e) {} }
+    function load(k) { try { return localStorage.getItem('ra2-' + k); } catch(e) { return null; } }
+
+    // ========== Voices ==========
     function loadVoices() {
-      state.voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
-      voiceSelect.innerHTML = '';
-      state.voices.forEach((v, i) => {
-        const opt = document.createElement('option');
-        opt.value = v.voiceURI;
-        opt.textContent = v.name.replace(/Microsoft |Google |Amazon |Apple /, '').substring(0, 20);
-        if (v.default) opt.selected = true;
-        voiceSelect.appendChild(opt);
+      S.voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+      const sel = $('voiceSelect');
+      sel.innerHTML = '';
+      S.voices.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v.voiceURI;
+        o.textContent = v.name.replace(/Microsoft |Google |Amazon |Apple /g, '').substring(0, 30);
+        if (v.default) o.selected = true;
+        sel.appendChild(o);
       });
-      // Restore saved voice
-      const saved = localStorage.getItem('ra-voice');
-      if (saved) {
-        voiceSelect.value = saved;
-        state.selectedVoiceURI = saved;
-      }
+      const saved = load('voice');
+      if (saved) { sel.value = saved; S.voiceURI = saved; }
     }
 
     synth.onvoiceschanged = loadVoices;
     loadVoices();
 
-    voiceSelect.addEventListener('change', () => {
-      state.selectedVoiceURI = voiceSelect.value;
-      localStorage.setItem('ra-voice', voiceSelect.value);
-      if (state.isPlaying) {
-        stopSpeaking();
-        speakCurrent();
-      }
+    $('voiceSelect').addEventListener('change', e => {
+      S.voiceURI = e.target.value;
+      save('voice', S.voiceURI);
+      if (S.playing) { stopSpeaking(); speakCurrent(); }
     });
 
-    // ===== Split text into sentences =====
-    function splitSentences(text) {
-      // Split on sentence-ending punctuation followed by space or end
-      const sentences = text.match(/[^.!?]*[.!?]+[\s]?|[^.!?]+$/g);
-      return sentences ? sentences.map(s => s.trim()).filter(Boolean) : [text];
-    }
-
-    // ===== Render transcript =====
+    // ========== Render ==========
     function render() {
-      transcript.innerHTML = '';
-      if (state.segments.length === 0) {
-        transcript.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">&#x1F4D6;</div>
-            <h2>No Document Loaded</h2>
-            <p>Import a .txt or .docx file to get started</p>
-          </div>`;
+      const rc = $('readerContent');
+      rc.innerHTML = '';
+
+      if (!S.segments.length) {
+        rc.innerHTML = `<div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <h2>No audiobook loaded</h2>
+          <p>Import a .txt, .json, or .docx file to start listening</p>
+        </div>`;
+        updateMeta();
         return;
       }
 
-      // Assign speaker colors
-      const speakerSet = [...new Set(state.segments.map(s => s.speaker))];
-      speakerSet.forEach((s, i) => state.speakers[s] = i < 2 ? i + 1 : ((i % 2) + 1));
+      // Map speakers
+      const spkList = [...new Set(S.segments.map(s => s.speaker).filter(Boolean))];
+      spkList.forEach((s, i) => S.speakers[s] = SPEAKER_COLORS[i % SPEAKER_COLORS.length]);
 
-      state.segments.forEach((seg, i) => {
+      S.segments.forEach((seg, i) => {
         const div = document.createElement('div');
-        div.className = `segment speaker-${state.speakers[seg.speaker] || 1}`;
-        if (state.bookmarks.has(i)) div.classList.add('bookmarked');
-        div.dataset.index = i;
+        div.className = 'seg';
+        if (S.bookmarks.has(i)) div.classList.add('bookmarked');
+        div.dataset.i = i;
 
         const sentences = splitSentences(seg.text);
+        const spkColor = S.speakers[seg.speaker] || SPEAKER_COLORS[0];
 
         div.innerHTML = `
-          <div class="segment-header">
-            <span class="speaker-name">${seg.speaker || 'Narrator'}</span>
-            ${seg.timestamp ? `<span class="timestamp">${seg.timestamp}</span>` : ''}
-          </div>
-          <div class="segment-text">
-            ${sentences.map((s, si) => `<span class="sentence" data-si="${si}">${escapeHtml(s)}</span>`).join(' ')}
-          </div>`;
+          ${seg.speaker ? `<div class="seg-speaker" style="color:var(--${spkColor})">
+            ${esc(seg.speaker)}
+            ${seg.timestamp ? `<span class="ts">${seg.timestamp}</span>` : ''}
+          </div>` : ''}
+          <div class="seg-body">${sentences.map((s, si) =>
+            `<span class="sentence" data-si="${si}">${esc(s)}</span>`
+          ).join(' ')}</div>`;
 
         div.addEventListener('click', () => {
-          goToSegment(i);
-          if (state.isPlaying) {
-            stopSpeaking();
-            speakCurrent();
-          }
+          goTo(i);
+          if (S.playing) { stopSpeaking(); speakCurrent(); }
         });
 
-        transcript.appendChild(div);
+        rc.appendChild(div);
       });
 
       updateUI();
     }
 
-    function escapeHtml(text) {
-      const d = document.createElement('div');
-      d.textContent = text;
-      return d.innerHTML;
-    }
-
-    // ===== Update UI state =====
+    // ========== UI updates ==========
     function updateUI() {
-      // Highlight active segment
-      document.querySelectorAll('.segment').forEach((el, i) => {
-        el.classList.toggle('active', i === state.currentSegment);
+      // Active segment
+      document.querySelectorAll('.seg').forEach((el, i) => {
+        el.classList.toggle('active', i === S.cur);
       });
 
-      // Highlight current sentence within active segment
-      const activeEl = document.querySelector('.segment.active');
-      if (activeEl) {
-        activeEl.querySelectorAll('.sentence').forEach((el, i) => {
-          el.classList.toggle('current-sentence', i === state.currentSentence);
+      // Sentence highlight
+      const active = document.querySelector('.seg.active');
+      if (active) {
+        active.querySelectorAll('.sentence').forEach((el, i) => {
+          el.classList.toggle('current', i === S.curSentence);
         });
       }
 
-      // Progress
-      const total = state.segments.length;
-      const pct = total > 0 ? ((state.currentSegment + 1) / total) * 100 : 0;
-      progressFill.style.width = pct + '%';
-      currentPos.textContent = `${state.currentSegment + 1} / ${total}`;
-      segmentCount.textContent = `${total} segments`;
+      updateMeta();
 
-      // Play button
-      playBtn.innerHTML = state.isPlaying ? '&#x23F8;' : '&#x25B6;';
-
-      // Auto-scroll to active
-      const active = document.querySelector('.segment.active');
+      // Auto scroll
       if (active) {
         active.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
-      // Save position
-      localStorage.setItem('ra-position', state.currentSegment);
+      // Play icon
+      $('playIcon').innerHTML = S.playing
+        ? '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>'
+        : '<polygon points="5 3 19 12 5 21 5 3"/>';
+
+      save('pos', S.cur);
     }
 
-    // ===== Navigation =====
-    function goToSegment(index) {
-      if (index < 0) index = 0;
-      if (index >= state.segments.length) index = state.segments.length - 1;
-      state.currentSegment = index;
-      state.currentSentence = 0;
+    function updateMeta() {
+      const total = S.segments.length;
+      const pct = total > 0 ? ((S.cur + 1) / total) * 100 : 0;
+      $('progressFill').style.width = pct + '%';
+      $('posLabel').textContent = total > 0 ? `${S.cur + 1} / ${total}` : '0 / 0';
+
+      // ETA: estimate based on average words per segment and speed
+      if (total > 0 && S.playing) {
+        const remaining = total - S.cur - 1;
+        const avgWords = S.segments.reduce((a, s) => a + s.text.split(' ').length, 0) / total;
+        const wordsPerMin = 150 * S.speed;
+        const minsLeft = Math.ceil((remaining * avgWords) / wordsPerMin);
+        $('etaLabel').textContent = minsLeft > 0 ? `~${minsLeft} min left` : 'Almost done';
+      } else {
+        $('etaLabel').textContent = total > 0 ? `${total} segments` : '';
+      }
+    }
+
+    // ========== Navigation ==========
+    function goTo(i) {
+      S.cur = Math.max(0, Math.min(i, S.segments.length - 1));
+      S.curSentence = 0;
       updateUI();
     }
 
-    function nextSegment() {
-      if (state.currentSegment < state.segments.length - 1) {
-        goToSegment(state.currentSegment + 1);
-        if (state.isPlaying) {
-          stopSpeaking();
-          speakCurrent();
-        }
-      } else {
-        pause();
-      }
+    function next() {
+      if (S.cur < S.segments.length - 1) {
+        goTo(S.cur + 1);
+        if (S.playing) { stopSpeaking(); speakCurrent(); }
+      } else { pause(); }
     }
 
-    function prevSegment() {
-      goToSegment(state.currentSegment - 1);
-      if (state.isPlaying) {
-        stopSpeaking();
-        speakCurrent();
-      }
+    function prev() {
+      goTo(S.cur - 1);
+      if (S.playing) { stopSpeaking(); speakCurrent(); }
     }
 
-    // ===== Speaking =====
+    // ========== Speech ==========
     function speakCurrent() {
-      if (state.currentSegment >= state.segments.length) return;
-
-      const seg = state.segments[state.currentSegment];
-      const sentences = splitSentences(seg.text);
-
-      speakSentence(sentences, state.currentSentence);
+      if (S.cur >= S.segments.length) return;
+      const sentences = splitSentences(S.segments[S.cur].text);
+      speakSentence(sentences, S.curSentence);
     }
 
-    function speakSentence(sentences, sentenceIndex) {
-      if (sentenceIndex >= sentences.length) {
-        // Move to next segment
-        if (state.currentSegment < state.segments.length - 1) {
-          state.currentSegment++;
-          state.currentSentence = 0;
+    function speakSentence(sentences, si) {
+      if (si >= sentences.length) {
+        if (S.cur < S.segments.length - 1) {
+          S.cur++;
+          S.curSentence = 0;
           updateUI();
           speakCurrent();
-        } else {
-          pause();
-        }
+        } else { pause(); }
         return;
       }
 
-      state.currentSentence = sentenceIndex;
+      S.curSentence = si;
 
-      // Update sentence highlighting
-      const activeEl = document.querySelector('.segment.active');
-      if (activeEl) {
-        activeEl.querySelectorAll('.sentence').forEach((el, i) => {
-          el.classList.toggle('current-sentence', i === sentenceIndex);
+      // Highlight
+      const active = document.querySelector('.seg.active');
+      if (active) {
+        active.querySelectorAll('.sentence').forEach((el, i) => {
+          el.classList.toggle('current', i === si);
         });
       }
 
-      const utter = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
-      utter.rate = state.speed;
+      const u = new SpeechSynthesisUtterance(sentences[si]);
+      u.rate = S.speed;
 
-      // Set voice
-      if (state.selectedVoiceURI) {
-        const voice = state.voices.find(v => v.voiceURI === state.selectedVoiceURI);
-        if (voice) utter.voice = voice;
+      if (S.voiceURI) {
+        const v = S.voices.find(v => v.voiceURI === S.voiceURI);
+        if (v) u.voice = v;
       }
 
-      utter.onend = () => {
-        if (state.isPlaying) {
-          speakSentence(sentences, sentenceIndex + 1);
-        }
-      };
+      u.onend = () => { if (S.playing) speakSentence(sentences, si + 1); };
+      u.onerror = (e) => { if (e.error !== 'canceled' && S.playing) speakSentence(sentences, si + 1); };
 
-      utter.onerror = (e) => {
-        if (e.error !== 'canceled' && state.isPlaying) {
-          speakSentence(sentences, sentenceIndex + 1);
-        }
-      };
-
-      state.utterance = utter;
-      synth.speak(utter);
+      synth.speak(u);
     }
 
-    function stopSpeaking() {
-      synth.cancel();
-      state.utterance = null;
+    function stopSpeaking() { synth.cancel(); }
+
+    function play() { S.playing = true; updateUI(); speakCurrent(); }
+    function pause() { S.playing = false; stopSpeaking(); updateUI(); }
+    function togglePlay() { S.playing ? pause() : play(); }
+
+    // ========== Speed ==========
+    function setSpeed(v) {
+      S.speed = Math.max(0.5, Math.min(3, v));
+      $('speedLabel').textContent = S.speed + 'x';
+      save('speed', S.speed);
+      renderSpeedPicker();
+      if (S.playing) { stopSpeaking(); speakCurrent(); }
     }
 
-    function play() {
-      state.isPlaying = true;
-      updateUI();
-      speakCurrent();
+    function renderSpeedPicker() {
+      $('speedPicker').innerHTML = SPEEDS.map(s =>
+        `<button class="speed-opt ${s === S.speed ? 'active' : ''}" data-s="${s}">${s}x</button>`
+      ).join('');
     }
 
-    function pause() {
-      state.isPlaying = false;
-      stopSpeaking();
-      updateUI();
-    }
+    $('speedPicker').addEventListener('click', e => {
+      const s = e.target.closest('.speed-opt');
+      if (s) setSpeed(parseFloat(s.dataset.s));
+    });
 
-    function togglePlay() {
-      if (state.isPlaying) pause();
-      else play();
-    }
+    $('speedChip').addEventListener('click', () => {
+      // Cycle through common speeds
+      const common = [0.75, 1, 1.25, 1.5, 2];
+      const idx = common.indexOf(S.speed);
+      setSpeed(common[(idx + 1) % common.length]);
+      showToast(`Speed: ${S.speed}x`);
+    });
 
-    // ===== Speed =====
-    function setSpeed(val) {
-      state.speed = Math.max(0.5, Math.min(3, val));
-      speedSlider.value = state.speed;
-      speedValue.textContent = state.speed + 'x';
-      localStorage.setItem('ra-speed', state.speed);
+    // ========== Sleep timer ==========
+    function setSleep(mins) {
+      clearInterval(S.sleepTimer);
+      S.sleepMinutes = mins;
 
-      if (state.isPlaying && state.utterance) {
-        stopSpeaking();
-        speakCurrent();
+      if (mins === 0) {
+        S.sleepEnd = 0;
+        $('sleepLabel').textContent = 'Sleep';
+        $('sleepChip').classList.remove('active');
+        renderSleepPicker();
+        return;
       }
+
+      S.sleepEnd = Date.now() + mins * 60000;
+      $('sleepChip').classList.add('active');
+      showToast(`Sleep timer: ${mins} min`);
+
+      S.sleepTimer = setInterval(() => {
+        const left = Math.max(0, S.sleepEnd - Date.now());
+        if (left <= 0) {
+          clearInterval(S.sleepTimer);
+          pause();
+          setSleep(0);
+          showToast('Sleep timer ended');
+          return;
+        }
+        const m = Math.floor(left / 60000);
+        const s = Math.floor((left % 60000) / 1000);
+        $('sleepLabel').textContent = `${m}:${String(s).padStart(2, '0')}`;
+      }, 1000);
+
+      renderSleepPicker();
     }
 
-    // ===== Bookmarks =====
+    function renderSleepPicker() {
+      $('sleepPicker').innerHTML = SLEEP_OPTIONS.map(m =>
+        `<button class="sleep-opt ${m === S.sleepMinutes ? 'active' : ''}" data-m="${m}">${m === 0 ? 'Off' : m + 'm'}</button>`
+      ).join('');
+    }
+
+    $('sleepPicker').addEventListener('click', e => {
+      const o = e.target.closest('.sleep-opt');
+      if (o) setSleep(parseInt(o.dataset.m));
+    });
+
+    $('sleepChip').addEventListener('click', () => {
+      // Quick toggle through sleep options
+      const opts = [0, 15, 30, 60];
+      const idx = opts.indexOf(S.sleepMinutes);
+      setSleep(opts[(idx + 1) % opts.length]);
+    });
+
+    // ========== Font size ==========
+    function setFontSize(px) {
+      S.fontSize = Math.max(12, Math.min(28, px));
+      document.documentElement.style.setProperty('--font-size', S.fontSize + 'px');
+      $('fontSizeLabel').textContent = S.fontSize;
+      save('fontSize', S.fontSize);
+    }
+
+    $('fontDown').addEventListener('click', () => setFontSize(S.fontSize - 2));
+    $('fontUp').addEventListener('click', () => setFontSize(S.fontSize + 2));
+
+    // ========== Theme ==========
+    function setTheme(t) {
+      S.theme = t;
+      document.body.dataset.theme = t;
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+      save('theme', t);
+    }
+
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.addEventListener('click', () => setTheme(b.dataset.t));
+    });
+
+    // ========== Bookmarks ==========
     function toggleBookmark() {
-      const idx = state.currentSegment;
-      if (state.bookmarks.has(idx)) {
-        state.bookmarks.delete(idx);
+      if (S.bookmarks.has(S.cur)) {
+        S.bookmarks.delete(S.cur);
         showToast('Bookmark removed');
       } else {
-        state.bookmarks.add(idx);
-        showToast('Bookmarked!');
+        S.bookmarks.add(S.cur);
+        showToast('Bookmarked');
       }
-      localStorage.setItem('ra-bookmarks', JSON.stringify([...state.bookmarks]));
-      // Update bookmarked class
-      const segEl = document.querySelectorAll('.segment')[idx];
-      if (segEl) segEl.classList.toggle('bookmarked', state.bookmarks.has(idx));
-      renderBookmarks();
+      save('bookmarks', [...S.bookmarks]);
+      $('bmBadge').classList.toggle('show', S.bookmarks.size > 0);
+
+      const el = document.querySelectorAll('.seg')[S.cur];
+      if (el) el.classList.toggle('bookmarked', S.bookmarks.has(S.cur));
     }
 
     function renderBookmarks() {
-      bookmarksList.innerHTML = '';
-      if (state.bookmarks.size === 0) {
-        bookmarksList.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No bookmarks yet. Press B or tap the pin to bookmark.</p>';
+      const body = $('bmBody');
+      if (!S.bookmarks.size) {
+        body.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:8px">No bookmarks yet. Press <kbd style="background:var(--surface-2);padding:2px 6px;border-radius:3px;font-size:11px">B</kbd> to add one.</p>';
         return;
       }
-      [...state.bookmarks].sort((a, b) => a - b).forEach(idx => {
-        const seg = state.segments[idx];
+      body.innerHTML = '';
+      [...S.bookmarks].sort((a, b) => a - b).forEach(i => {
+        const seg = S.segments[i];
         if (!seg) return;
         const div = document.createElement('div');
-        div.className = 'bookmark-item';
+        div.className = 'bm-item';
         div.innerHTML = `
-          <div class="bm-speaker" style="color:var(--speaker-${state.speakers[seg.speaker] || 1})">${seg.speaker} ${seg.timestamp || ''}</div>
-          <div class="bm-text">${escapeHtml(seg.text)}</div>`;
-        div.addEventListener('click', () => {
-          goToSegment(idx);
-          bookmarksPanel.classList.remove('show');
+          <span class="bm-item-remove" data-i="${i}">&times;</span>
+          <div class="bm-item-speaker" style="color:var(--${S.speakers[seg.speaker] || SPEAKER_COLORS[0]})">${esc(seg.speaker || 'Narrator')} ${seg.timestamp || ''}</div>
+          <div class="bm-item-text">${esc(seg.text)}</div>`;
+        div.addEventListener('click', e => {
+          if (e.target.classList.contains('bm-item-remove')) {
+            S.bookmarks.delete(parseInt(e.target.dataset.i));
+            save('bookmarks', [...S.bookmarks]);
+            $('bmBadge').classList.toggle('show', S.bookmarks.size > 0);
+            const segEl = document.querySelectorAll('.seg')[i];
+            if (segEl) segEl.classList.remove('bookmarked');
+            renderBookmarks();
+            return;
+          }
+          goTo(i);
+          closeAllPanels();
         });
-        bookmarksList.appendChild(div);
+        body.appendChild(div);
       });
     }
 
-    // ===== Toast =====
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1500);
+    // ========== TOC ==========
+    function renderTOC() {
+      const body = $('tocBody');
+      body.innerHTML = '';
+      // Group by speaker turns or every N segments
+      S.segments.forEach((seg, i) => {
+        // Show every speaker change or every 5th segment
+        if (i === 0 || seg.speaker !== S.segments[i-1]?.speaker) {
+          const div = document.createElement('div');
+          div.className = `toc-item ${i === S.cur ? 'current' : ''}`;
+          div.innerHTML = `
+            <span class="toc-num">${seg.timestamp || i + 1}</span>
+            <span class="toc-text" style="color:var(--${S.speakers[seg.speaker] || SPEAKER_COLORS[0]})">${esc(seg.speaker || 'Narrator')}: ${esc(seg.text.substring(0, 60))}${seg.text.length > 60 ? '...' : ''}</span>`;
+          div.addEventListener('click', () => { goTo(i); closeAllPanels(); });
+          body.appendChild(div);
+        }
+      });
     }
 
-    // ===== Theme =====
-    function toggleTheme() {
-      document.body.classList.toggle('light');
-      const isLight = document.body.classList.contains('light');
-      themeBtn.innerHTML = isLight ? '&#x2600;' : '&#x1F319;';
-      localStorage.setItem('ra-theme', isLight ? 'light' : 'dark');
+    // ========== Search ==========
+    let searchDebounce;
+    $('searchInput').addEventListener('input', e => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => doSearch(e.target.value), 200);
+    });
+
+    function doSearch(q) {
+      const results = $('searchResults');
+      if (!q.trim()) { results.innerHTML = ''; return; }
+
+      const lower = q.toLowerCase();
+      const matches = [];
+      S.segments.forEach((seg, i) => {
+        const idx = seg.text.toLowerCase().indexOf(lower);
+        if (idx !== -1) {
+          matches.push({ i, seg, idx });
+        }
+      });
+
+      if (!matches.length) {
+        results.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:8px">No results</p>';
+        return;
+      }
+
+      results.innerHTML = '';
+      matches.slice(0, 20).forEach(({ i, seg, idx }) => {
+        const div = document.createElement('div');
+        div.className = 'search-result';
+        const start = Math.max(0, idx - 30);
+        const end = Math.min(seg.text.length, idx + q.length + 30);
+        const snippet = (start > 0 ? '...' : '') +
+          esc(seg.text.substring(start, idx)) +
+          `<mark>${esc(seg.text.substring(idx, idx + q.length))}</mark>` +
+          esc(seg.text.substring(idx + q.length, end)) +
+          (end < seg.text.length ? '...' : '');
+
+        div.innerHTML = `<div class="sr-speaker">${esc(seg.speaker || '')} ${seg.timestamp || ''}</div><div>${snippet}</div>`;
+        div.addEventListener('click', () => { goTo(i); closeAllPanels(); });
+        results.appendChild(div);
+      });
     }
 
-    // ===== Import =====
-    function showImport() { importOverlay.classList.add('show'); }
-    function hideImport() { importOverlay.classList.remove('show'); }
+    // ========== Panels ==========
+    function openPanel(id) {
+      closeAllPanels();
+      $(id).classList.add('show');
+      $('panelOverlay').classList.add('show');
+    }
+
+    function closeAllPanels() {
+      ['tocPanel', 'bmPanel', 'settingsPanel', 'searchPanel'].forEach(id => $(id).classList.remove('show'));
+      $('panelOverlay').classList.remove('show');
+    }
+
+    $('panelOverlay').addEventListener('click', closeAllPanels);
+    $('tocBtn').addEventListener('click', () => { renderTOC(); openPanel('tocPanel'); });
+    $('tocClose').addEventListener('click', closeAllPanels);
+    $('bookmarkListBtn').addEventListener('click', () => { renderBookmarks(); openPanel('bmPanel'); });
+    $('bmClose').addEventListener('click', closeAllPanels);
+    $('settingsBtn').addEventListener('click', () => openPanel('settingsPanel'));
+    $('settingsClose').addEventListener('click', closeAllPanels);
+    $('searchBtn').addEventListener('click', () => { openPanel('searchPanel'); setTimeout(() => $('searchInput').focus(), 100); });
+    $('searchClose').addEventListener('click', closeAllPanels);
+
+    // ========== Import ==========
+    $('importBtn').addEventListener('click', () => $('importModal').classList.add('show'));
+    $('importCancel').addEventListener('click', () => $('importModal').classList.remove('show'));
+    $('importModal').addEventListener('click', e => { if (e.target === $('importModal')) $('importModal').classList.remove('show'); });
+
+    $('dropZone').addEventListener('click', () => $('fileInput').click());
+    $('dropZone').addEventListener('dragover', e => { e.preventDefault(); $('dropZone').classList.add('dragover'); });
+    $('dropZone').addEventListener('dragleave', () => $('dropZone').classList.remove('dragover'));
+    $('dropZone').addEventListener('drop', e => { e.preventDefault(); $('dropZone').classList.remove('dragover'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+    $('fileInput').addEventListener('change', () => { if ($('fileInput').files.length) handleFile($('fileInput').files[0]); });
 
     function handleFile(file) {
       const ext = file.name.split('.').pop().toLowerCase();
-
       if (ext === 'json') {
-        file.text().then(text => {
-          try {
-            const data = JSON.parse(text);
-            if (Array.isArray(data)) {
-              loadSegments(data);
-              hideImport();
-            }
-          } catch(e) { showToast('Invalid JSON'); }
+        file.text().then(t => {
+          try { loadSegments(JSON.parse(t)); $('importModal').classList.remove('show'); } catch(e) { showToast('Invalid JSON'); }
         });
       } else if (ext === 'txt') {
-        file.text().then(text => {
-          const segments = text.split('\n').filter(l => l.trim()).map(line => {
-            // Try to parse "Speaker | timestamp\ntext" format
-            const match = line.match(/^(.+?)\s*\|\s*(\d+:\d+)\s*$/);
-            if (match) return { speaker: match[1], timestamp: match[2], text: '' };
-            return { speaker: '', timestamp: '', text: line };
-          });
-          // Merge: assign speaker headers to their text
-          const merged = [];
-          for (let i = 0; i < segments.length; i++) {
-            if (segments[i].speaker && !segments[i].text && segments[i+1]) {
-              segments[i+1].speaker = segments[i].speaker;
-              segments[i+1].timestamp = segments[i].timestamp;
-            } else if (segments[i].text) {
-              merged.push(segments[i]);
+        file.text().then(t => {
+          const lines = t.split('\n').filter(l => l.trim());
+          const segs = [];
+          let cur = null;
+          for (const line of lines) {
+            const hdr = line.match(/^(.+?)\s*\|\s*(\d+:\d+)\s*$/);
+            if (hdr) {
+              if (cur) segs.push(cur);
+              cur = { speaker: hdr[1].trim(), timestamp: hdr[2], text: '' };
+            } else if (cur) {
+              cur.text += (cur.text ? ' ' : '') + line.trim();
+            } else {
+              segs.push({ speaker: '', timestamp: '', text: line.trim() });
             }
           }
-          loadSegments(merged.length ? merged : segments.filter(s => s.text));
-          hideImport();
+          if (cur) segs.push(cur);
+          loadSegments(segs.filter(s => s.text));
+          $('importModal').classList.remove('show');
         });
       } else {
-        showToast('Supported: .txt, .json');
+        showToast('Supported formats: .txt, .json');
       }
     }
 
-    // ===== Load segments =====
-    function loadSegments(segments) {
-      state.segments = segments;
-      state.currentSegment = 0;
-      state.currentSentence = 0;
-      state.bookmarks.clear();
+    function loadSegments(segs) {
+      S.segments = segs;
+      S.cur = 0;
+      S.curSentence = 0;
+      S.bookmarks.clear();
+      $('bmBadge').classList.remove('show');
       pause();
       render();
-      showToast(`Loaded ${segments.length} segments`);
-      localStorage.setItem('ra-segments', JSON.stringify(segments));
+      save('segments', segs);
+      showToast(`Loaded ${segs.length} segments`);
     }
 
-    // ===== Progress click =====
-    progressContainer.addEventListener('click', (e) => {
-      const rect = progressContainer.getBoundingClientRect();
+    // ========== Progress click ==========
+    $('progressBar').addEventListener('click', e => {
+      const rect = $('progressBar').getBoundingClientRect();
       const pct = (e.clientX - rect.left) / rect.width;
-      const idx = Math.floor(pct * state.segments.length);
-      goToSegment(idx);
-      if (state.isPlaying) {
-        stopSpeaking();
-        speakCurrent();
+      goTo(Math.floor(pct * S.segments.length));
+      if (S.playing) { stopSpeaking(); speakCurrent(); }
+    });
+
+    // ========== Control buttons ==========
+    $('playBtn').addEventListener('click', togglePlay);
+    $('nextBtn').addEventListener('click', next);
+    $('prevBtn').addEventListener('click', prev);
+    $('skipStartBtn').addEventListener('click', () => goTo(0));
+    $('skipEndBtn').addEventListener('click', () => goTo(S.segments.length - 1));
+    $('bookmarkChip').addEventListener('click', toggleBookmark);
+
+    // ========== Keyboard ==========
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+        if (e.code === 'Escape') { closeAllPanels(); e.target.blur(); }
+        return;
+      }
+
+      switch (e.code) {
+        case 'Space': e.preventDefault(); togglePlay(); break;
+        case 'ArrowRight': e.preventDefault(); next(); break;
+        case 'ArrowLeft': e.preventDefault(); prev(); break;
+        case 'ArrowUp': e.preventDefault(); setSpeed(S.speed + 0.25); showToast(`Speed: ${S.speed}x`); break;
+        case 'ArrowDown': e.preventDefault(); setSpeed(S.speed - 0.25); showToast(`Speed: ${S.speed}x`); break;
+        case 'KeyB': toggleBookmark(); break;
+        case 'KeyM': setTheme(S.theme === 'dark' ? 'light' : S.theme === 'light' ? 'sepia' : 'dark'); break;
+        case 'Home': goTo(0); break;
+        case 'End': goTo(S.segments.length - 1); break;
+        case 'Slash': e.preventDefault(); openPanel('searchPanel'); setTimeout(() => $('searchInput').focus(), 100); break;
+        case 'Escape': closeAllPanels(); break;
       }
     });
 
-    // ===== Event Listeners =====
-    playBtn.addEventListener('click', togglePlay);
-    nextBtn.addEventListener('click', nextSegment);
-    prevBtn.addEventListener('click', prevSegment);
-    skipStartBtn.addEventListener('click', () => goToSegment(0));
-    skipEndBtn.addEventListener('click', () => goToSegment(state.segments.length - 1));
-    bookmarkBtn.addEventListener('click', toggleBookmark);
-
-    speedSlider.addEventListener('input', () => setSpeed(parseFloat(speedSlider.value)));
-    $('speedDown').addEventListener('click', () => setSpeed(state.speed - 0.25));
-    $('speedUp').addEventListener('click', () => setSpeed(state.speed + 0.25));
-    $('speedValue').addEventListener('click', () => setSpeed(1)); // Reset to 1x
-
-    themeBtn.addEventListener('click', toggleTheme);
-    importBtn.addEventListener('click', showImport);
-    importClose.addEventListener('click', hideImport);
-    importOverlay.addEventListener('click', (e) => { if (e.target === importOverlay) hideImport(); });
-
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
-
-    bookmarkListBtn.addEventListener('click', () => {
-      bookmarksPanel.classList.toggle('show');
-      renderBookmarks();
-    });
-
-    // Close bookmarks on outside click
-    document.addEventListener('click', (e) => {
-      if (bookmarksPanel.classList.contains('show') &&
-          !bookmarksPanel.contains(e.target) &&
-          e.target !== bookmarkListBtn) {
-        bookmarksPanel.classList.remove('show');
-      }
-    });
-
-    // ===== Keyboard Shortcuts =====
-    document.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-
-      switch(e.code) {
-        case 'Space':
-          e.preventDefault();
-          togglePlay();
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          nextSegment();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          prevSegment();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSpeed(state.speed + 0.25);
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          setSpeed(state.speed - 0.25);
-          break;
-        case 'KeyB':
-          toggleBookmark();
-          break;
-        case 'KeyM':
-          toggleTheme();
-          break;
-        case 'Equal':
-        case 'NumpadAdd':
-          setSpeed(state.speed + 0.25);
-          break;
-        case 'Minus':
-        case 'NumpadSubtract':
-          setSpeed(state.speed - 0.25);
-          break;
-        case 'Home':
-          goToSegment(0);
-          break;
-        case 'End':
-          goToSegment(state.segments.length - 1);
-          break;
-      }
-    });
-
-    // ===== Touch swipe support =====
-    let touchStartX = 0;
-    transcript.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
+    // ========== Touch swipe ==========
+    let touchX = 0;
+    $('reader').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+    $('reader').addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 80) { dx > 0 ? prev() : next(); }
     }, { passive: true });
 
-    transcript.addEventListener('touchend', (e) => {
-      const diff = e.changedTouches[0].clientX - touchStartX;
-      if (Math.abs(diff) > 80) {
-        if (diff > 0) prevSegment();
-        else nextSegment();
-      }
-    }, { passive: true });
+    // ========== Chrome speech bug workaround ==========
+    setInterval(() => { if (S.playing && synth.speaking) { synth.pause(); synth.resume(); } }, 10000);
 
-    // ===== Init =====
+    // ========== Service Worker ==========
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    // ========== Init ==========
     function init() {
-      // Restore theme
-      const savedTheme = localStorage.getItem('ra-theme');
-      if (savedTheme === 'light') {
-        document.body.classList.add('light');
-        themeBtn.innerHTML = '&#x2600;';
-      }
+      // Theme
+      const savedTheme = load('theme');
+      if (savedTheme) setTheme(savedTheme);
 
-      // Restore speed
-      const savedSpeed = localStorage.getItem('ra-speed');
+      // Speed
+      const savedSpeed = load('speed');
       if (savedSpeed) setSpeed(parseFloat(savedSpeed));
+      else renderSpeedPicker();
 
-      // Try to load saved segments or fetch default
-      const savedSegments = localStorage.getItem('ra-segments');
-      if (savedSegments) {
-        try {
-          state.segments = JSON.parse(savedSegments);
-        } catch(e) {}
+      // Font size
+      const savedFont = load('fontSize');
+      if (savedFont) setFontSize(parseInt(savedFont));
+
+      // Sleep
+      renderSleepPicker();
+
+      // Segments
+      const savedSegs = load('segments');
+      if (savedSegs) {
+        try { S.segments = JSON.parse(savedSegs); } catch(e) {}
       }
 
-      if (state.segments.length === 0) {
-        // Try to load the default transcript
+      if (!S.segments.length) {
         fetch('transcript.json')
           .then(r => r.json())
-          .then(data => {
-            state.segments = data;
-            localStorage.setItem('ra-segments', JSON.stringify(data));
-            finishInit();
-          })
+          .then(data => { S.segments = data; save('segments', data); finishInit(); })
           .catch(() => finishInit());
       } else {
         finishInit();
@@ -1118,35 +1585,22 @@
     }
 
     function finishInit() {
-      // Restore bookmarks
-      const savedBookmarks = localStorage.getItem('ra-bookmarks');
-      if (savedBookmarks) {
-        try {
-          JSON.parse(savedBookmarks).forEach(b => state.bookmarks.add(b));
-        } catch(e) {}
+      // Bookmarks
+      const savedBm = load('bookmarks');
+      if (savedBm) {
+        try { JSON.parse(savedBm).forEach(b => S.bookmarks.add(b)); } catch(e) {}
+        $('bmBadge').classList.toggle('show', S.bookmarks.size > 0);
       }
 
-      // Restore position
-      const savedPos = localStorage.getItem('ra-position');
-      if (savedPos) state.currentSegment = Math.min(parseInt(savedPos) || 0, state.segments.length - 1);
+      // Position
+      const savedPos = load('pos');
+      if (savedPos) S.cur = Math.min(parseInt(savedPos) || 0, S.segments.length - 1);
 
       render();
     }
 
-    // Keep synth alive (Chrome bug workaround)
-    setInterval(() => {
-      if (state.isPlaying && synth.speaking) {
-        synth.pause();
-        synth.resume();
-      }
-    }, 10000);
-
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
-
     init();
+  })();
   </script>
 </body>
 </html>
