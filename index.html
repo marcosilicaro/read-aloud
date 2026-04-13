@@ -1424,8 +1424,8 @@ Rules for each section:
   });
 
   // ========== API key ==========
-  $('apiKeyInput').addEventListener('change', e => {
-    const key = e.target.value.trim();
+  function saveApiKey(key) {
+    key = (key || '').trim();
     if (key) {
       S.apiKey = key; save('apiKey', key);
       $('apiKeyDot').className = 'api-key-dot set';
@@ -1435,6 +1435,13 @@ Rules for each section:
       $('apiKeyDot').className = 'api-key-dot unset';
       $('apiKeyStatus').textContent = 'Not set';
     }
+  }
+  // Save on every keystroke, blur, paste — whatever happens first
+  ['input', 'change', 'blur', 'paste'].forEach(evt => {
+    $('apiKeyInput').addEventListener(evt, () => {
+      // Small delay for paste event so the value is actually there
+      setTimeout(() => saveApiKey($('apiKeyInput').value), 10);
+    });
   });
 
   // ========== Instructions ==========
