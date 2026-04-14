@@ -1372,7 +1372,7 @@ service cloud.firestore {
         </div>
         <div class="tutorial-text">
           <div class="tutorial-action">Tap</div>
-          <div class="tutorial-desc">Play or pause, and show the menu</div>
+          <div class="tutorial-desc">Show the menu (buttons control playback)</div>
         </div>
       </div>
 
@@ -1926,6 +1926,9 @@ service cloud.firestore {
     await loadSummaries();
     S.aiSummary = loadAISummary(S.chapter);
     renderChapter();
+
+    // On mobile: show chrome by default when opening a book so Play is reachable
+    if (isMobile()) showChrome(0);
 
     // Show tutorial on mobile (once per session, unless "don't show" was saved)
     maybeShowTutorial();
@@ -2690,8 +2693,19 @@ Rules for each section:
     synth.cancel();
   }
 
-  function play() { S.playing=true; updateUI(); speakCurrent(); }
-  function pause() { S.playing=false; stopSpeaking(); updateUI(); }
+  function play() {
+    S.playing=true;
+    updateUI();
+    speakCurrent();
+    // On mobile: hide the menu once playback resumes
+    if (typeof hideChrome === 'function') hideChrome();
+  }
+  function pause() {
+    S.playing=false;
+    stopSpeaking();
+    updateUI();
+    // Keep chrome visible if it's shown - user just stopped playback
+  }
   function togglePlay() { S.playing?pause():play(); }
 
   // ========== Speed ==========
@@ -3009,11 +3023,9 @@ Rules for each section:
   function handleReaderTap(e) {
     if (S.readerMode !== 'text') return;
     if (e.target.closest('a, button, input, select, textarea')) return;
-    // One tap: toggle play/pause AND reveal the chrome (which IS the feedback)
-    togglePlay();
-    showChrome();
-    // No flash overlay - the chrome sliding in is feedback enough,
-    // and the play button in the chrome shows the current state
+    // One tap: show the menu. Audio keeps doing whatever it was doing.
+    // Chrome stays visible until the user presses Play (no auto-hide).
+    showChrome(0);
   }
 
   const reader = $('reader');
