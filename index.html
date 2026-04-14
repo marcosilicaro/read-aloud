@@ -208,18 +208,23 @@
 
     /* In summary mode, the controls bar is hidden - collapse the reader-content
        bottom padding (default 280px is for the fixed controls in text mode).
-       Also explicitly re-enable scrolling in case the text mode touch-action:none
-       sticks on iOS Safari. */
-    body.summary-mode .reader {
-      touch-action: auto !important;
+       Also explicitly re-enable scrolling in case the text-mode touch-action:none
+       sticks on iOS Safari (pan-y allows vertical touch-scroll explicitly). */
+    body.summary-mode .reader,
+    body.summary-mode #readerView.active .reader {
+      touch-action: pan-y !important;
       overflow-y: auto !important;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain !important;
+      -webkit-overflow-scrolling: touch !important;
     }
-    body.summary-mode .reader-content {
+    body.summary-mode .reader-content,
+    body.summary-mode #readerView.active .reader-content {
       padding-bottom: 40px !important;
       padding-top: 24px !important;
-      touch-action: auto !important;
+      touch-action: pan-y !important;
+    }
+    body.summary-mode .summary-view {
+      touch-action: pan-y !important;
     }
 
     .summary-hero {
@@ -2895,6 +2900,8 @@ Rules for each section:
   const reader = $('reader');
   if (reader) {
     reader.addEventListener('touchstart', e => {
+      // In summary mode, don't capture touches - let browser scroll natively
+      if (S.readerMode !== 'text') { touchStart = null; return; }
       touchStart = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY,
@@ -2904,14 +2911,12 @@ Rules for each section:
 
     reader.addEventListener('touchend', e => {
       if (!touchStart) return;
+      if (S.readerMode !== 'text') { touchStart = null; return; }
       const dx = e.changedTouches[0].clientX - touchStart.x;
       const dy = e.changedTouches[0].clientY - touchStart.y;
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
       touchStart = null;
-
-      // Summary mode: let the browser scroll natively, no custom gestures
-      if (S.readerMode !== 'text') return;
 
       // Vertical swipe = navigate paragraphs.
       // If playing, TTS continues on the new paragraph.
@@ -2920,7 +2925,6 @@ Rules for each section:
         if (dy < 0) { next(); flashAction('next'); }
         else { prev(); flashAction('prev'); }
       }
-      // All other gestures (taps, horizontal swipes) ignored
     }, { passive: true });
   }
 
