@@ -2966,8 +2966,14 @@ Rules for each section:
   function handleReaderTap(e) {
     if (S.readerMode !== 'text') return;
     if (e.target.closest('a, button, input, select, textarea')) return;
-    // One tap: show the menu. Audio keeps doing whatever it was doing.
-    // Chrome stays visible until the user presses Play (no auto-hide).
+    const chromeOpen = document.body.classList.contains('chrome-visible');
+    // When paused and chrome is visible, tapping hides chrome so user can
+    // silently swipe through paragraphs without triggering TTS.
+    if (chromeOpen && !S.playing) {
+      hideChrome();
+      return;
+    }
+    // Otherwise: reveal the menu. Stays until user presses Play.
     showChrome(0);
   }
 
@@ -2990,20 +2996,24 @@ Rules for each section:
       const absDy = Math.abs(dy);
       touchStart = null;
 
+      // In summary mode, let the browser handle scroll natively - don't
+      // intercept anything or we'll accidentally navigate/re-render.
+      if (S.readerMode !== 'text') return;
+
       // Tap (no significant movement)
       if (absDx < 10 && absDy < 10 && dt < 400) {
         handleReaderTap(e);
         return;
       }
 
-      // Vertical swipe = navigate paragraphs
+      // Vertical swipe = navigate paragraphs.
+      // If not playing, navigation is silent (no TTS starts).
+      // If playing, next()/prev() keeps audio going on the new paragraph.
       if (absDy > 50 && absDy > absDx * 1.2) {
         if (dy < 0) {
-          // Swipe up = next paragraph
           next();
           flashAction('next');
         } else {
-          // Swipe down = previous paragraph
           prev();
           flashAction('prev');
         }
