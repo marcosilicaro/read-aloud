@@ -743,50 +743,77 @@
       .lib-grid { grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); }
     }
 
-    /* ===== Mobile Minimal Mode (text reader only) ===== */
+    /* ===== Mobile Minimal Chrome ===== */
     @media (max-width:768px) {
-      /* Chrome overlays the text as a floating layer - never affects layout */
-      body.reader-open:not(.summary-mode) #readerView.active .reader-header {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 110;
-        transform: translateY(-100%);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+      /* Compact header */
+      #readerView .reader-header {
+        padding: 6px 12px;
       }
-      body.reader-open:not(.summary-mode):not(.tutorial-open).chrome-visible #readerView.active .reader-header {
-        transform: translateY(0);
-        opacity: 1;
-        pointer-events: auto;
+      #readerView .reader-header-left { gap: 8px; }
+      #readerView .reader-header-left h1 {
+        font-size: 13px;
+        max-width: 42vw;
       }
+      #readerView .header-actions { gap: 0; }
+      #readerView .icon-btn {
+        width: 32px; height: 32px;
+      }
+      #readerView .icon-btn svg { width: 15px; height: 15px; }
+      #readerView .back-btn svg { width: 17px; height: 17px; }
 
-      body.reader-open:not(.summary-mode) #readerView.active .controls-wrapper {
-        transform: translateY(100%);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
+      /* Compact bottom controls */
+      body.reader-open:not(.summary-mode) .controls-wrapper {
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
       }
-      body.reader-open:not(.summary-mode):not(.tutorial-open).chrome-visible #readerView.active .controls-wrapper {
-        transform: translateY(0);
-        opacity: 1;
-        pointer-events: auto;
+      body.reader-open:not(.summary-mode) .progress-bar {
+        padding: 6px 16px 0;
+        height: 16px;
       }
+      body.reader-open:not(.summary-mode) .progress-track { height: 3px; }
+      body.reader-open:not(.summary-mode) .progress-meta {
+        padding: 2px 16px 0;
+        font-size: 10px;
+      }
+      body.reader-open:not(.summary-mode) .controls {
+        padding: 4px 0 2px;
+        gap: 4px;
+      }
+      body.reader-open:not(.summary-mode) .ctrl.sm {
+        width: 30px; height: 30px;
+      }
+      body.reader-open:not(.summary-mode) .ctrl.sm svg { width: 15px; height: 15px; }
+      body.reader-open:not(.summary-mode) .ctrl.md {
+        width: 36px; height: 36px;
+      }
+      body.reader-open:not(.summary-mode) .ctrl.md svg { width: 17px; height: 17px; }
+      body.reader-open:not(.summary-mode) .ctrl.play-btn {
+        width: 46px; height: 46px;
+      }
+      body.reader-open:not(.summary-mode) .ctrl.play-btn svg { width: 19px; height: 19px; }
+      body.reader-open:not(.summary-mode) .controls-meta {
+        padding: 2px 0 0;
+        gap: 14px;
+      }
+      body.reader-open:not(.summary-mode) .meta-chip {
+        font-size: 11px;
+        padding: 2px 6px;
+        gap: 3px;
+      }
+      body.reader-open:not(.summary-mode) .meta-chip svg { width: 11px; height: 11px; }
 
-      /* Reader fills the entire screen since chrome is an overlay */
+      /* Reader content - no native scroll, vertical swipes navigate */
       body.reader-open:not(.summary-mode) #readerView.active .reader {
-        padding-top: 0;
         touch-action: none;
         overscroll-behavior: none;
       }
       body.reader-open:not(.summary-mode) #readerView.active .reader-content {
         touch-action: none;
-        padding: 72px 22px 120px;
+        padding: 16px 22px 24px;
         max-width: 100%;
         font-size: 17px;
       }
 
-      /* ----- Text appearance (CONSTANT - never changes with chrome state) ----- */
+      /* Focus dim - constant */
       body.reader-open:not(.summary-mode) .seg {
         opacity: 0.3;
         transition: opacity 0.5s ease;
@@ -810,30 +837,9 @@
       }
       body.reader-open:not(.summary-mode) .seg-speaker {
         opacity: 0.5;
-      }
-
-      /* Extra soft fade at top/bottom so the chrome bleeds nicely over text */
-      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::before,
-      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::after {
-        content: '';
-        position: fixed;
-        left: 0; right: 0;
-        height: 40px;
-        pointer-events: none;
-        z-index: 105;
-        opacity: 0;
-        animation: fadeInQuick 0.3s ease forwards;
-      }
-      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::before {
-        top: 56px;
-        background: linear-gradient(to bottom, var(--bg), transparent);
-      }
-      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::after {
-        bottom: 180px;
-        background: linear-gradient(to top, var(--bg), transparent);
+        font-size: 10px;
       }
     }
-    @keyframes fadeInQuick { to { opacity: 1; } }
 
     /* Subtle tap feedback - small icon near top, fades quickly */
     .tap-feedback {
@@ -856,61 +862,6 @@
       transform: translateX(-50%) scale(1);
     }
     .tap-feedback svg { width: 22px; height: 22px; stroke: #fff; fill: #fff; }
-    /* Hide tap feedback on swipe (since chrome appears, that's the feedback) */
-    body.chrome-visible .tap-feedback.show { opacity: 0; }
-
-    /* Reveal hint - tiny arrow at top when chrome is hidden */
-    .reveal-hint {
-      display: none;
-      position: fixed;
-      top: 6px; left: 50%;
-      transform: translateX(-50%);
-      width: 36px; height: 4px;
-      background: var(--text-muted);
-      opacity: 0.35;
-      border-radius: 2px;
-      z-index: 50;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    @media (max-width:768px) {
-      body.reader-open:not(.chrome-visible):not(.summary-mode) .reveal-hint {
-        display: block;
-      }
-    }
-
-    /* Status indicator when playing on mobile minimal */
-    .play-indicator {
-      display: none;
-      position: fixed;
-      bottom: 18px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent);
-      color: white;
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      align-items: center; justify-content: center;
-      z-index: 50;
-      box-shadow: 0 4px 16px var(--accent-glow);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-    @media (max-width:768px) {
-      body.reader-open:not(.chrome-visible):not(.summary-mode).is-playing .play-indicator {
-        display: flex;
-        opacity: 0;
-        animation: playPulse 2s ease-out;
-        animation-fill-mode: forwards;
-      }
-    }
-    @keyframes playPulse {
-      0% { opacity: 0; }
-      20% { opacity: 0.85; }
-      80% { opacity: 0.3; }
-      100% { opacity: 0; }
-    }
-    .play-indicator svg { width: 20px; height: 20px; fill: white; stroke: white; }
 
     /* ===== Tutorial overlay (first view / refresh on mobile) ===== */
     .tutorial-overlay {
@@ -1327,26 +1278,14 @@ service cloud.firestore {
   <input type="file" id="fileInput" accept=".txt,.json,.epub">
   <div class="toast" id="toast"></div>
 
-  <!-- Mobile minimal-mode overlays -->
-  <div class="reveal-hint"></div>
-  <div class="tap-feedback" id="tapFeedback"><svg viewBox="0 0 24 24" id="tapFeedbackIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-  <div class="play-indicator"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+  <!-- Swipe feedback icon (brief chevron shown on swipe up/down) -->
+  <div class="tap-feedback" id="tapFeedback"><svg viewBox="0 0 24 24" id="tapFeedbackIcon"><polyline points="18 15 12 9 6 15"/></svg></div>
 
   <!-- Tutorial overlay (shown on first mobile view / on refresh) -->
   <div class="tutorial-overlay" id="tutorialOverlay">
     <div class="tutorial-card">
       <div class="tutorial-title">Quick Guide</div>
-      <div class="tutorial-subtitle">Only the paragraph being read is in focus. Everything else fades.</div>
-
-      <div class="tutorial-gesture">
-        <div class="tutorial-icon tap">
-          <div class="tutorial-finger"></div>
-        </div>
-        <div class="tutorial-text">
-          <div class="tutorial-action">Tap</div>
-          <div class="tutorial-desc">Show the menu (buttons control playback)</div>
-        </div>
-      </div>
+      <div class="tutorial-subtitle">Only the paragraph being read stays in focus. Everything else fades.</div>
 
       <div class="tutorial-gesture">
         <div class="tutorial-icon swipe-up">
@@ -1365,6 +1304,16 @@ service cloud.firestore {
         <div class="tutorial-text">
           <div class="tutorial-action">Swipe down</div>
           <div class="tutorial-desc">Previous paragraph</div>
+        </div>
+      </div>
+
+      <div class="tutorial-gesture">
+        <div class="tutorial-icon tap">
+          <div class="tutorial-finger"></div>
+        </div>
+        <div class="tutorial-text">
+          <div class="tutorial-action">Buttons</div>
+          <div class="tutorial-desc">Always visible at top and bottom for play, pause, and everything else</div>
         </div>
       </div>
 
@@ -1895,9 +1844,6 @@ service cloud.firestore {
     await loadSummaries();
     S.aiSummary = loadAISummary(S.chapter);
     renderChapter();
-
-    // On mobile: show chrome by default when opening a book so Play is reachable
-    if (isMobile()) showChrome(0);
 
     // Show tutorial on mobile (once per session, unless "don't show" was saved)
     maybeShowTutorial();
@@ -2636,19 +2582,8 @@ Rules for each section:
     synth.cancel();
   }
 
-  function play() {
-    S.playing=true;
-    updateUI();
-    speakCurrent();
-    // On mobile: hide the menu once playback resumes
-    if (typeof hideChrome === 'function') hideChrome();
-  }
-  function pause() {
-    S.playing=false;
-    stopSpeaking();
-    updateUI();
-    // Keep chrome visible if it's shown - user just stopped playback
-  }
+  function play() { S.playing=true; updateUI(); speakCurrent(); }
+  function pause() { S.playing=false; stopSpeaking(); updateUI(); }
   function togglePlay() { S.playing?pause():play(); }
 
   // ========== Speed ==========
@@ -2924,57 +2859,20 @@ Rules for each section:
     }
   });
 
-  // ========== Touch gestures (mobile minimal mode) ==========
+  // ========== Touch gestures ==========
   let touchStart = null;
-  let chromeTimer = null;
-
-  function showChrome(duration = 4000) {
-    document.body.classList.add('chrome-visible');
-    clearTimeout(chromeTimer);
-    if (duration > 0) {
-      chromeTimer = setTimeout(() => {
-        document.body.classList.remove('chrome-visible');
-      }, duration);
-    }
-  }
-
-  function hideChrome() {
-    clearTimeout(chromeTimer);
-    document.body.classList.remove('chrome-visible');
-  }
 
   function flashAction(kind) {
-    // kind = 'play' | 'pause' | 'next' | 'prev'
+    // kind = 'next' | 'prev' (shown briefly on swipe)
     const el = $('tapFeedback');
     const icon = $('tapFeedbackIcon');
-    if (kind === 'play') {
-      icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
-    } else if (kind === 'pause') {
-      icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
-    } else if (kind === 'next') {
-      icon.innerHTML = '<polyline points="18 15 12 9 6 15"/>';
-    } else if (kind === 'prev') {
-      icon.innerHTML = '<polyline points="6 9 12 15 18 9"/>';
-    }
+    if (kind === 'next') icon.innerHTML = '<polyline points="18 15 12 9 6 15"/>';
+    else if (kind === 'prev') icon.innerHTML = '<polyline points="6 9 12 15 18 9"/>';
     el.classList.remove('show');
     void el.offsetWidth;
     el.classList.add('show');
     clearTimeout(el._t);
     el._t = setTimeout(() => el.classList.remove('show'), 500);
-  }
-
-  function handleReaderTap(e) {
-    if (S.readerMode !== 'text') return;
-    if (e.target.closest('a, button, input, select, textarea')) return;
-    const chromeOpen = document.body.classList.contains('chrome-visible');
-    // When paused and chrome is visible, tapping hides chrome so user can
-    // silently swipe through paragraphs without triggering TTS.
-    if (chromeOpen && !S.playing) {
-      hideChrome();
-      return;
-    }
-    // Otherwise: reveal the menu. Stays until user presses Play.
-    showChrome(0);
   }
 
   const reader = $('reader');
@@ -2991,34 +2889,21 @@ Rules for each section:
       if (!touchStart) return;
       const dx = e.changedTouches[0].clientX - touchStart.x;
       const dy = e.changedTouches[0].clientY - touchStart.y;
-      const dt = Date.now() - touchStart.t;
       const absDx = Math.abs(dx);
       const absDy = Math.abs(dy);
       touchStart = null;
 
-      // In summary mode, let the browser handle scroll natively - don't
-      // intercept anything or we'll accidentally navigate/re-render.
+      // Summary mode: let the browser scroll natively, no custom gestures
       if (S.readerMode !== 'text') return;
 
-      // Tap (no significant movement)
-      if (absDx < 10 && absDy < 10 && dt < 400) {
-        handleReaderTap(e);
-        return;
-      }
-
       // Vertical swipe = navigate paragraphs.
-      // If not playing, navigation is silent (no TTS starts).
-      // If playing, next()/prev() keeps audio going on the new paragraph.
+      // If playing, TTS continues on the new paragraph.
+      // If paused, navigation is silent.
       if (absDy > 50 && absDy > absDx * 1.2) {
-        if (dy < 0) {
-          next();
-          flashAction('next');
-        } else {
-          prev();
-          flashAction('prev');
-        }
+        if (dy < 0) { next(); flashAction('next'); }
+        else { prev(); flashAction('prev'); }
       }
-      // Horizontal swipes ignored
+      // All other gestures (taps, horizontal swipes) ignored
     }, { passive: true });
   }
 
@@ -3034,7 +2919,7 @@ Rules for each section:
   updateUI = function() { origUpdateUI(); updateBodyClass(); };
 
   const origShowView = showView;
-  showView = function(name) { origShowView(name); updateBodyClass(); hideChrome(); };
+  showView = function(name) { origShowView(name); updateBodyClass(); };
 
   const origToggleReaderMode = toggleReaderMode;
   toggleReaderMode = function() { origToggleReaderMode(); updateBodyClass(); };
