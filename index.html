@@ -765,28 +765,35 @@
 
     /* ===== Mobile Minimal Mode (text reader only) ===== */
     @media (max-width:768px) {
-      /* Hide chrome by default in reader/text mode */
-      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .reader-header,
-      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .controls-wrapper {
-        pointer-events:none;
-        opacity:0;
-        transform:translateY(var(--chrome-hide-y, 0));
+      /* Chrome overlays the text as a floating layer - never affects layout */
+      body.reader-open:not(.summary-mode) #readerView.active .reader-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 110;
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+      body.reader-open:not(.summary-mode):not(.tutorial-open).chrome-visible #readerView.active .reader-header {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
       }
 
-      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .reader-header {
-        --chrome-hide-y: -100%;
+      body.reader-open:not(.summary-mode) #readerView.active .controls-wrapper {
+        transform: translateY(100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
       }
-      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .controls-wrapper {
-        --chrome-hide-y: 100%;
+      body.reader-open:not(.summary-mode):not(.tutorial-open).chrome-visible #readerView.active .controls-wrapper {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
       }
 
-      /* Smooth transition */
-      #readerView.active .reader-header,
-      #readerView.active .controls-wrapper {
-        transition: opacity 0.35s ease, transform 0.35s ease;
-      }
-
-      /* Reader fills the screen and disables native scroll/pinch */
+      /* Reader fills the entire screen since chrome is an overlay */
       body.reader-open:not(.summary-mode) #readerView.active .reader {
         padding-top: 0;
         touch-action: none;
@@ -794,69 +801,83 @@
       }
       body.reader-open:not(.summary-mode) #readerView.active .reader-content {
         touch-action: none;
-      }
-
-      /* Reading content - comfortable mobile layout */
-      body.reader-open:not(.summary-mode) .reader-content {
-        padding: 80px 22px 120px;
-        max-width:100%;
+        padding: 72px 22px 120px;
+        max-width: 100%;
         font-size: 17px;
       }
 
-      /* Dim non-active segments for focus */
-      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg {
-        opacity: 0.35;
+      /* ----- Text appearance (CONSTANT - never changes with chrome state) ----- */
+      body.reader-open:not(.summary-mode) .seg {
+        opacity: 0.3;
         transition: opacity 0.5s ease;
-        background:none !important;
-        border-left-color:transparent !important;
-        padding:10px 0;
-        margin-bottom:12px;
+        background: none !important;
+        border-left-color: transparent !important;
+        padding: 10px 0 !important;
+        margin-bottom: 12px;
       }
-      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg.active {
+      body.reader-open:not(.summary-mode) .seg.active {
         opacity: 1;
-        background:none !important;
-        border-left-color:transparent !important;
+        background: none !important;
+        border-left-color: transparent !important;
       }
-
-      /* Remove segment hover/click affordances on mobile minimal */
-      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg:hover {
-        background:none !important;
+      body.reader-open:not(.summary-mode) .seg:hover {
+        background: none !important;
       }
-
-      /* Current sentence: cleaner, warmer highlight */
-      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg.active .sentence.current {
+      body.reader-open:not(.summary-mode) .seg.active .sentence.current {
         background: var(--accent-glow);
         box-shadow: 0 0 0 4px var(--accent-glow);
         border-radius: 6px;
       }
-
-      /* Speaker label de-emphasized */
-      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg-speaker {
+      body.reader-open:not(.summary-mode) .seg-speaker {
         opacity: 0.5;
       }
-    }
 
-    /* Tap feedback overlay - brief icon shown on tap */
+      /* Extra soft fade at top/bottom so the chrome bleeds nicely over text */
+      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::before,
+      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::after {
+        content: '';
+        position: fixed;
+        left: 0; right: 0;
+        height: 40px;
+        pointer-events: none;
+        z-index: 105;
+        opacity: 0;
+        animation: fadeInQuick 0.3s ease forwards;
+      }
+      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::before {
+        top: 56px;
+        background: linear-gradient(to bottom, var(--bg), transparent);
+      }
+      body.reader-open:not(.summary-mode).chrome-visible #readerView.active .reader-content::after {
+        bottom: 180px;
+        background: linear-gradient(to top, var(--bg), transparent);
+      }
+    }
+    @keyframes fadeInQuick { to { opacity: 1; } }
+
+    /* Subtle tap feedback - small icon near top, fades quickly */
     .tap-feedback {
       position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(0.7);
-      width: 80px; height: 80px;
-      background: rgba(0,0,0,0.55);
+      top: 70px; left: 50%;
+      transform: translateX(-50%) scale(0.85);
+      width: 52px; height: 52px;
+      background: var(--accent);
       color: #fff;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.25s ease, transform 0.25s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease;
       z-index: 500;
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
-    [data-theme="light"] .tap-feedback { background: rgba(0,0,0,0.7); }
     .tap-feedback.show {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translateX(-50%) scale(1);
     }
-    .tap-feedback svg { width: 36px; height: 36px; stroke: #fff; fill: #fff; }
+    .tap-feedback svg { width: 22px; height: 22px; stroke: #fff; fill: #fff; }
+    /* Hide tap feedback on swipe (since chrome appears, that's the feedback) */
+    body.chrome-visible .tap-feedback.show { opacity: 0; }
 
     /* Reveal hint - tiny arrow at top when chrome is hidden */
     .reveal-hint {
@@ -2988,10 +3009,11 @@ Rules for each section:
   function handleReaderTap(e) {
     if (S.readerMode !== 'text') return;
     if (e.target.closest('a, button, input, select, textarea')) return;
-    // One tap: toggle play/pause AND show the chrome
+    // One tap: toggle play/pause AND reveal the chrome (which IS the feedback)
     togglePlay();
-    flashAction(S.playing ? 'play' : 'pause');
     showChrome();
+    // No flash overlay - the chrome sliding in is feedback enough,
+    // and the play button in the chrome shows the current state
   }
 
   const reader = $('reader');
