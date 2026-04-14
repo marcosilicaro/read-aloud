@@ -1020,6 +1020,25 @@
     .tutorial-icon.swipe-right .tutorial-finger { animation: fingerSwipeRight 1.4s ease-in-out infinite; }
     .tutorial-icon.swipe-down .tutorial-finger { animation: fingerSwipeDown 1.4s ease-in-out infinite; }
 
+    /* Multi-tap animations: numbered pulses */
+    @keyframes tapPulse1 {
+      0%, 35%, 100% { opacity: 0; transform: scale(0.6); }
+      10%, 20% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes tapPulse2 {
+      0%, 25%, 60%, 100% { opacity: 0; transform: scale(0.6); }
+      35%, 45% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes tapPulse3 {
+      0%, 50%, 85%, 100% { opacity: 0; transform: scale(0.6); }
+      60%, 70% { opacity: 1; transform: scale(1); }
+    }
+    .tutorial-icon.tap-double .tutorial-finger { animation: tapPulse1 1.6s ease-in-out infinite; }
+    .tutorial-icon.tap-double .tutorial-finger-2 { animation: tapPulse2 1.6s ease-in-out infinite; }
+    .tutorial-icon.tap-triple .tutorial-finger { animation: tapPulse1 2s ease-in-out infinite; }
+    .tutorial-icon.tap-triple .tutorial-finger-2 { animation: tapPulse2 2s ease-in-out infinite; }
+    .tutorial-icon.tap-triple .tutorial-finger-3 { animation: tapPulse3 2s ease-in-out infinite; }
+
     .tutorial-text { flex: 1; min-width: 0; }
     .tutorial-action { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
     .tutorial-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
@@ -1330,34 +1349,37 @@ service cloud.firestore {
   <div class="tutorial-overlay" id="tutorialOverlay">
     <div class="tutorial-card">
       <div class="tutorial-title">Quick Guide</div>
-      <div class="tutorial-subtitle">Control playback with gestures on the text</div>
+      <div class="tutorial-subtitle">Tap the text to control playback</div>
 
       <div class="tutorial-gesture">
         <div class="tutorial-icon tap">
           <div class="tutorial-finger"></div>
         </div>
         <div class="tutorial-text">
-          <div class="tutorial-action">Tap</div>
+          <div class="tutorial-action">1 tap</div>
           <div class="tutorial-desc">Play or pause</div>
         </div>
       </div>
 
       <div class="tutorial-gesture">
-        <div class="tutorial-icon swipe-left">
+        <div class="tutorial-icon tap-double">
           <div class="tutorial-finger"></div>
+          <div class="tutorial-finger tutorial-finger-2"></div>
         </div>
         <div class="tutorial-text">
-          <div class="tutorial-action">Swipe left</div>
+          <div class="tutorial-action">2 taps</div>
           <div class="tutorial-desc">Next paragraph</div>
         </div>
       </div>
 
       <div class="tutorial-gesture">
-        <div class="tutorial-icon swipe-right">
+        <div class="tutorial-icon tap-triple">
           <div class="tutorial-finger"></div>
+          <div class="tutorial-finger tutorial-finger-2"></div>
+          <div class="tutorial-finger tutorial-finger-3"></div>
         </div>
         <div class="tutorial-text">
-          <div class="tutorial-action">Swipe right</div>
+          <div class="tutorial-action">3 taps</div>
           <div class="tutorial-desc">Previous paragraph</div>
         </div>
       </div>
@@ -1368,7 +1390,7 @@ service cloud.firestore {
         </div>
         <div class="tutorial-text">
           <div class="tutorial-action">Swipe down or up</div>
-          <div class="tutorial-desc">Show controls and menu</div>
+          <div class="tutorial-desc">Show the menu (back, settings, bookmarks)</div>
         </div>
       </div>
 
@@ -2962,17 +2984,60 @@ Rules for each section:
     document.body.classList.remove('chrome-visible');
   }
 
-  function flashTapFeedback(isPlay) {
+  // Multi-tap state (1/2/3-tap detection)
+  const tapState = { count: 0, timer: null, initialPlaying: null };
+  const MULTI_TAP_WINDOW = 340; // ms window to register additional taps
+
+  function flashAction(kind) {
+    // kind = 'play' | 'pause' | 'next' | 'prev'
     const el = $('tapFeedback');
     const icon = $('tapFeedbackIcon');
-    icon.innerHTML = isPlay
-      ? '<polygon points="5 3 19 12 5 21 5 3"/>'
-      : '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    if (kind === 'play') {
+      icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    } else if (kind === 'pause') {
+      icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    } else if (kind === 'next') {
+      icon.innerHTML = '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>';
+    } else if (kind === 'prev') {
+      icon.innerHTML = '<polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>';
+    }
     el.classList.remove('show');
-    void el.offsetWidth; // reflow
+    void el.offsetWidth;
     el.classList.add('show');
     clearTimeout(el._t);
-    el._t = setTimeout(() => el.classList.remove('show'), 450);
+    el._t = setTimeout(() => el.classList.remove('show'), 500);
+  }
+
+  function handleReaderTap(e) {
+    // Only in text mode
+    if (S.readerMode !== 'text') return;
+    // Skip taps on interactive elements
+    if (e.target.closest('a, button, input, select, textarea')) return;
+
+    // First tap of a sequence: play/pause immediately for snappy feel
+    if (tapState.count === 0) {
+      tapState.initialPlaying = S.playing;
+      togglePlay();
+      flashAction(S.playing ? 'play' : 'pause');
+    }
+    tapState.count++;
+
+    clearTimeout(tapState.timer);
+    tapState.timer = setTimeout(() => {
+      if (tapState.count === 2) {
+        // Double tap: revert the play/pause we just did, then go next
+        if (S.playing !== tapState.initialPlaying) togglePlay();
+        next();
+        flashAction('next');
+      } else if (tapState.count >= 3) {
+        // Triple tap: revert play/pause, then go prev
+        if (S.playing !== tapState.initialPlaying) togglePlay();
+        prev();
+        flashAction('prev');
+      }
+      tapState.count = 0;
+      tapState.initialPlaying = null;
+    }, MULTI_TAP_WINDOW);
   }
 
   const reader = $('reader');
@@ -3000,13 +3065,7 @@ Rules for each section:
         return;
       }
 
-      // Horizontal swipe - segment navigation
-      if (absDx > 60 && absDx > absDy * 1.5) {
-        dx > 0 ? prev() : next();
-        return;
-      }
-
-      // Vertical swipe - toggle chrome (both directions)
+      // Vertical swipe - toggle chrome (escape hatch for back/settings)
       if (absDy > 80 && absDy > absDx * 1.5) {
         if (document.body.classList.contains('chrome-visible')) {
           hideChrome();
@@ -3014,19 +3073,8 @@ Rules for each section:
           showChrome();
         }
       }
+      // Horizontal swipes intentionally ignored - use multi-tap instead
     }, { passive: true });
-
-    // Handle tap - only toggle play/pause if it was a clean tap on the text
-    function handleReaderTap(e) {
-      // Only handle in text mode (not summary)
-      if (S.readerMode !== 'text') return;
-
-      // Don't handle if tap was on a link or button
-      if (e.target.closest('a, button')) return;
-
-      togglePlay();
-      flashTapFeedback(!S.playing); // show what happened (pause icon if now playing, etc)
-    }
   }
 
   // Update body class based on playing state and view
