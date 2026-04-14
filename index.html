@@ -207,13 +207,19 @@
     .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 40px; }
 
     /* In summary mode, the controls bar is hidden - collapse the reader-content
-       bottom padding (default 280px is for the fixed controls in text mode). */
-    body.summary-mode .reader-content {
-      padding-bottom: 0 !important;
-      padding-top: 0 !important;
-    }
+       bottom padding (default 280px is for the fixed controls in text mode).
+       Also explicitly re-enable scrolling in case the text mode touch-action:none
+       sticks on iOS Safari. */
     body.summary-mode .reader {
+      touch-action: auto !important;
+      overflow-y: auto !important;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    body.summary-mode .reader-content {
+      padding-bottom: 40px !important;
+      padding-top: 24px !important;
+      touch-action: auto !important;
     }
 
     .summary-hero {
@@ -547,7 +553,7 @@
     .setup-modal-save:disabled { opacity:0.5; cursor:not-allowed; }
 
     /* Reader area */
-    .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; }
+    .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
     .reader-content { max-width:680px; margin:0 auto; padding:32px 24px 280px; }
 
     .seg {
