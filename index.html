@@ -752,8 +752,8 @@
 
     /* Responsive */
     @media (max-width:480px) {
+      .lib-header { padding:12px 16px; }
       .reader-header { padding:8px 14px; }
-      .reader-content { padding:20px 16px 280px; }
       .kb-hint { display:none; }
       .lib-grid { grid-template-columns:1fr; }
       .book-card-actions { opacity:1; }
@@ -762,6 +762,149 @@
       .reader-content { max-width:720px; padding:48px 32px 300px; }
       .lib-grid { grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); }
     }
+
+    /* ===== Mobile Minimal Mode (text reader only) ===== */
+    @media (max-width:768px) {
+      /* Hide chrome by default in reader/text mode */
+      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .reader-header,
+      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .controls-wrapper {
+        pointer-events:none;
+        opacity:0;
+        transform:translateY(var(--chrome-hide-y, 0));
+      }
+
+      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .reader-header {
+        --chrome-hide-y: -100%;
+      }
+      body.reader-open:not(.chrome-visible):not(.summary-mode) #readerView.active .controls-wrapper {
+        --chrome-hide-y: 100%;
+      }
+
+      /* Smooth transition */
+      #readerView.active .reader-header,
+      #readerView.active .controls-wrapper {
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+
+      /* Reader fills the screen */
+      body.reader-open:not(.summary-mode) #readerView.active .reader {
+        padding-top: 0;
+      }
+
+      /* Reading content - comfortable mobile layout */
+      body.reader-open:not(.summary-mode) .reader-content {
+        padding: 80px 22px 120px;
+        max-width:100%;
+        font-size: 17px;
+      }
+
+      /* Dim non-active segments for focus */
+      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg {
+        opacity: 0.35;
+        transition: opacity 0.5s ease;
+        background:none !important;
+        border-left-color:transparent !important;
+        padding:10px 0;
+        margin-bottom:12px;
+      }
+      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg.active {
+        opacity: 1;
+        background:none !important;
+        border-left-color:transparent !important;
+      }
+
+      /* Remove segment hover/click affordances on mobile minimal */
+      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg:hover {
+        background:none !important;
+      }
+
+      /* Current sentence: cleaner, warmer highlight */
+      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg.active .sentence.current {
+        background: var(--accent-glow);
+        box-shadow: 0 0 0 4px var(--accent-glow);
+        border-radius: 6px;
+      }
+
+      /* Speaker label de-emphasized */
+      body.reader-open:not(.summary-mode):not(.chrome-visible) .seg-speaker {
+        opacity: 0.5;
+      }
+    }
+
+    /* Tap feedback overlay - brief icon shown on tap */
+    .tap-feedback {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.7);
+      width: 80px; height: 80px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 500;
+    }
+    [data-theme="light"] .tap-feedback { background: rgba(0,0,0,0.7); }
+    .tap-feedback.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .tap-feedback svg { width: 36px; height: 36px; stroke: #fff; fill: #fff; }
+
+    /* Reveal hint - tiny arrow at top when chrome is hidden */
+    .reveal-hint {
+      display: none;
+      position: fixed;
+      top: 6px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px; height: 4px;
+      background: var(--text-muted);
+      opacity: 0.35;
+      border-radius: 2px;
+      z-index: 50;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    @media (max-width:768px) {
+      body.reader-open:not(.chrome-visible):not(.summary-mode) .reveal-hint {
+        display: block;
+      }
+    }
+
+    /* Status indicator when playing on mobile minimal */
+    .play-indicator {
+      display: none;
+      position: fixed;
+      bottom: 18px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      align-items: center; justify-content: center;
+      z-index: 50;
+      box-shadow: 0 4px 16px var(--accent-glow);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    @media (max-width:768px) {
+      body.reader-open:not(.chrome-visible):not(.summary-mode).is-playing .play-indicator {
+        display: flex;
+        opacity: 0;
+        animation: playPulse 2s ease-out;
+        animation-fill-mode: forwards;
+      }
+    }
+    @keyframes playPulse {
+      0% { opacity: 0; }
+      20% { opacity: 0.85; }
+      80% { opacity: 0.3; }
+      100% { opacity: 0; }
+    }
+    .play-indicator svg { width: 20px; height: 20px; fill: white; stroke: white; }
 
     /* Loading spinner */
     .loading { display:flex; align-items:center; justify-content:center; padding:40px; }
@@ -1028,6 +1171,11 @@ service cloud.firestore {
 
   <input type="file" id="fileInput" accept=".txt,.json,.epub">
   <div class="toast" id="toast"></div>
+
+  <!-- Mobile minimal-mode overlays -->
+  <div class="reveal-hint"></div>
+  <div class="tap-feedback" id="tapFeedback"><svg viewBox="0 0 24 24" id="tapFeedbackIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+  <div class="play-indicator"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
 
 <script>
 (() => {
@@ -2563,10 +2711,108 @@ Rules for each section:
     }
   });
 
-  // ========== Touch swipe ==========
-  let touchX=0;
-  $('reader')?.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
-  $('reader')?.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchX;if(Math.abs(dx)>80){dx>0?prev():next();}},{passive:true});
+  // ========== Touch gestures (mobile minimal mode) ==========
+  let touchStart = null;
+  let chromeTimer = null;
+
+  function showChrome(duration = 4000) {
+    document.body.classList.add('chrome-visible');
+    clearTimeout(chromeTimer);
+    if (duration > 0) {
+      chromeTimer = setTimeout(() => {
+        document.body.classList.remove('chrome-visible');
+      }, duration);
+    }
+  }
+
+  function hideChrome() {
+    clearTimeout(chromeTimer);
+    document.body.classList.remove('chrome-visible');
+  }
+
+  function flashTapFeedback(isPlay) {
+    const el = $('tapFeedback');
+    const icon = $('tapFeedbackIcon');
+    icon.innerHTML = isPlay
+      ? '<polygon points="5 3 19 12 5 21 5 3"/>'
+      : '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    el.classList.remove('show');
+    void el.offsetWidth; // reflow
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 450);
+  }
+
+  const reader = $('reader');
+  if (reader) {
+    reader.addEventListener('touchstart', e => {
+      touchStart = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        t: Date.now(),
+      };
+    }, { passive: true });
+
+    reader.addEventListener('touchend', e => {
+      if (!touchStart) return;
+      const dx = e.changedTouches[0].clientX - touchStart.x;
+      const dy = e.changedTouches[0].clientY - touchStart.y;
+      const dt = Date.now() - touchStart.t;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      touchStart = null;
+
+      // Tap (no significant movement, quick)
+      if (absDx < 10 && absDy < 10 && dt < 300) {
+        handleReaderTap(e);
+        return;
+      }
+
+      // Horizontal swipe - segment navigation
+      if (absDx > 60 && absDx > absDy * 1.5) {
+        dx > 0 ? prev() : next();
+        return;
+      }
+
+      // Vertical swipe - toggle chrome (both directions)
+      if (absDy > 80 && absDy > absDx * 1.5) {
+        if (document.body.classList.contains('chrome-visible')) {
+          hideChrome();
+        } else {
+          showChrome();
+        }
+      }
+    }, { passive: true });
+
+    // Handle tap - only toggle play/pause if it was a clean tap on the text
+    function handleReaderTap(e) {
+      // Only handle in text mode (not summary)
+      if (S.readerMode !== 'text') return;
+
+      // Don't handle if tap was on a link or button
+      if (e.target.closest('a, button')) return;
+
+      togglePlay();
+      flashTapFeedback(!S.playing); // show what happened (pause icon if now playing, etc)
+    }
+  }
+
+  // Update body class based on playing state and view
+  function updateBodyClass() {
+    document.body.classList.toggle('is-playing', S.playing);
+    document.body.classList.toggle('reader-open', S.view === 'reader');
+    document.body.classList.toggle('summary-mode', S.readerMode === 'summary');
+  }
+
+  // Hook updateBodyClass into state changes
+  const origUpdateUI = updateUI;
+  updateUI = function() { origUpdateUI(); updateBodyClass(); };
+
+  const origShowView = showView;
+  showView = function(name) { origShowView(name); updateBodyClass(); hideChrome(); };
+
+  const origToggleReaderMode = toggleReaderMode;
+  toggleReaderMode = function() { origToggleReaderMode(); updateBodyClass(); };
 
   // ========== Voice selector ==========
   const savedVoice = load('voice');

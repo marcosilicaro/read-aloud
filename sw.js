@@ -1,4 +1,4 @@
-const CACHE_NAME = 'read-aloud-v2';
+const CACHE_NAME = 'read-aloud-v4';
 const ASSETS = [
   '/',
   '/index.html',
