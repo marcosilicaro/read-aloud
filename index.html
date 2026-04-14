@@ -289,74 +289,54 @@
     .summary-nav-btn:hover { background:var(--surface-hover); color:var(--text); }
     .summary-nav-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; }
 
+    /* Generate / Re-summarize button */
+    .summary-generate-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0 28px;
+    }
+    .summary-generate-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(128,128,128,0.15);
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      transition: all 0.2s;
+    }
+    .summary-generate-btn:hover:not(:disabled) {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .summary-generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .summary-generate-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Generation loading state */
+    .summary-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .summary-loading .spinner {
+      width: 22px; height: 22px; border-width: 2.5px;
+    }
+
     /* View toggle button highlight */
     .icon-btn.view-toggle.summary-active { color:var(--accent); background:var(--accent-soft); }
 
-    /* ===== Chat bar (summary mode) ===== */
-    .chat-bar {
-      position:fixed; bottom:0; left:0; right:0;
-      background:var(--surface); border-top:1px solid rgba(128,128,128,0.1);
-      padding:10px 16px; padding-bottom:max(10px, env(safe-area-inset-bottom));
-      z-index:100; display:none;
-    }
-    .chat-bar.show { display:block; }
-
-    .chat-input-row {
-      display:flex; gap:8px; align-items:flex-end; max-width:680px; margin:0 auto;
-    }
-
-    .chat-input {
-      flex:1; padding:10px 14px; border-radius:20px;
-      border:1px solid rgba(128,128,128,0.15); background:var(--surface-2);
-      color:var(--text); font-size:14px; font-family:var(--font-ui);
-      outline:none; resize:none; max-height:100px; min-height:40px;
-      line-height:1.4; transition:border-color 0.2s;
-    }
-    .chat-input:focus { border-color:var(--accent); }
-    .chat-input::placeholder { color:var(--text-muted); }
-
-    .chat-send {
-      width:40px; height:40px; border-radius:50%; border:none;
-      background:var(--accent); color:white; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      transition:all 0.2s; flex-shrink:0;
-    }
-    .chat-send:hover { box-shadow:0 2px 12px var(--accent-glow); }
-    .chat-send:disabled { opacity:0.4; cursor:not-allowed; }
-    .chat-send svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-
-    /* Chat messages in summary view */
-    .chat-history {
-      max-width:680px; margin:0 auto; padding:0 24px;
-    }
-
-    .chat-msg {
-      margin-bottom:12px; padding:10px 14px; border-radius:var(--radius);
-      font-size:13px; line-height:1.5; max-width:85%;
-    }
-
-    .chat-msg.user {
-      background:var(--accent); color:white;
-      margin-left:auto; border-bottom-right-radius:4px;
-    }
-
-    .chat-msg.ai {
-      background:var(--surface); color:var(--text-secondary);
-      border:1px solid rgba(128,128,128,0.08);
-      border-bottom-left-radius:4px;
-    }
-
-    .chat-msg.ai .chat-thinking {
-      display:inline-flex; gap:4px; align-items:center;
-    }
-
-    .chat-msg.ai .chat-thinking span {
-      width:6px; height:6px; background:var(--text-muted); border-radius:50%;
-      animation:chatPulse 1.2s ease-in-out infinite;
-    }
-    .chat-msg.ai .chat-thinking span:nth-child(2) { animation-delay:0.2s; }
-    .chat-msg.ai .chat-thinking span:nth-child(3) { animation-delay:0.4s; }
-
+    /* Pulse animation reused by sync status dot */
     @keyframes chatPulse {
       0%,80%,100% { opacity:0.3; transform:scale(0.8); }
       40% { opacity:1; transform:scale(1); }
@@ -1256,15 +1236,7 @@
     </div>
   </div>
 
-  <!-- Chat bar for AI summary -->
-  <div class="chat-bar" id="chatBar">
-    <div class="chat-input-row">
-      <textarea class="chat-input" id="chatInput" placeholder="Ask to reshape the summary..." rows="1"></textarea>
-      <button class="chat-send" id="chatSend" title="Send">
-        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-    </div>
-  </div>
+  <!-- Chat bar removed - summary is now generated on-demand via buttons -->
 
   <!-- Firebase setup modal -->
   <div class="setup-modal-overlay" id="setupModalOverlay">
@@ -1431,9 +1403,8 @@ service cloud.firestore {
     readerMode: 'text', // 'text' | 'summary'
     summaries: null,    // loaded summaries data
     apiKey: null,
-    chatHistory: [],    // [{role,content}] for current chapter
-    aiSummary: null,    // AI-generated summary for current chapter
-    chatBusy: false,
+    aiSummary: null,         // AI-generated summary for current chapter
+    summaryGenerating: false,
     // Cloud sync
     firebaseConfig: null,
     firebaseApp: null,
@@ -1920,8 +1891,6 @@ service cloud.firestore {
     $('viewToggleBtn').classList.remove('summary-active');
     $('viewToggleIcon').innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
     $('controlsWrapper').style.display = '';
-    $('chatBar').classList.remove('show');
-    S.chatHistory = [];
 
     await loadSummaries();
     S.aiSummary = loadAISummary(S.chapter);
@@ -2062,46 +2031,56 @@ Timeline: Key dates and events in chronological order`;
     }
 
     let html = '<div class="summary-view">';
+    let hasSummary = false;
 
-    // Use AI-generated sections if available
-    const aiSections = S.aiSummary;
-
-    if (aiSections && Array.isArray(aiSections) && aiSections.length) {
-      aiSections.forEach((sec, i) => {
-        sec._isFirst = (i === 0);
-        sec._chapterTitle = ch.title;
-        html += renderSectionHTML(sec);
-      });
+    // If currently generating, show spinner only
+    if (S.summaryGenerating) {
+      html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
+        <div class="summary-hero-idea" style="color:var(--text-muted)">Generating summary…</div></div>`;
+      html += '<div class="summary-loading"><div class="spinner"></div><span>Reading the chapter and building your summary</span></div>';
     } else {
-      // Fall back to pre-built summary (old format)
-      const sum = getSummary(S.book?.id, S.chapter);
-      if (sum && sum.bigIdea) {
-        // Convert old format to sections for rendering
-        const fakeSections = [
-          { title: 'Big Idea', content: sum.bigIdea, _isFirst: true, _chapterTitle: (sum.period ? ch.title + ' \u00B7 ' + sum.period : ch.title) }
-        ];
-        if (sum.keyPoints?.length) fakeSections.push({ title: 'Key Takeaways', items: sum.keyPoints });
-        if (sum.keyFigures?.length) fakeSections.push({ title: 'Key Figures', items: sum.keyFigures });
-        if (sum.keyTerms?.length) fakeSections.push({ title: 'Key Concepts', items: sum.keyTerms });
-        fakeSections.forEach(sec => { html += renderSectionHTML(sec); });
+      // Use AI-generated sections if available
+      const aiSections = S.aiSummary;
+
+      if (aiSections && Array.isArray(aiSections) && aiSections.length) {
+        aiSections.forEach((sec, i) => {
+          sec._isFirst = (i === 0);
+          sec._chapterTitle = ch.title;
+          html += renderSectionHTML(sec);
+        });
+        hasSummary = true;
       } else {
-        html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
-          <div class="summary-hero-idea" style="color:var(--text-muted)">No summary yet. Use the chat below or go to Settings to generate all summaries with AI.</div></div>`;
+        // Fall back to pre-built summary (old format)
+        const sum = getSummary(S.book?.id, S.chapter);
+        if (sum && sum.bigIdea) {
+          const fakeSections = [
+            { title: 'Big Idea', content: sum.bigIdea, _isFirst: true, _chapterTitle: (sum.period ? ch.title + ' \u00B7 ' + sum.period : ch.title) }
+          ];
+          if (sum.keyPoints?.length) fakeSections.push({ title: 'Key Takeaways', items: sum.keyPoints });
+          if (sum.keyFigures?.length) fakeSections.push({ title: 'Key Figures', items: sum.keyFigures });
+          if (sum.keyTerms?.length) fakeSections.push({ title: 'Key Concepts', items: sum.keyTerms });
+          fakeSections.forEach(sec => { html += renderSectionHTML(sec); });
+          hasSummary = true;
+        } else {
+          html += `<div class="summary-hero"><div class="summary-hero-period">${esc(ch.title)}</div>
+            <div class="summary-hero-idea" style="color:var(--text-muted)">No summary yet for this chapter.</div></div>`;
+        }
       }
-    }
 
-    // Chat history
-    if (S.chatHistory.length) {
-      html += '<div class="summary-section-title">Conversation</div><div class="chat-history">';
-      S.chatHistory.forEach(msg => {
-        if (msg.role === 'user') html += `<div class="chat-msg user">${esc(msg.content)}</div>`;
-        else if (msg.role === 'assistant' && msg._display) html += `<div class="chat-msg ai">${esc(msg._display)}</div>`;
-      });
+      // Generate / Re-summarize button (always available, hides only while generating)
+      html += '<div class="summary-generate-wrap">';
+      if (hasSummary) {
+        html += `<button class="summary-generate-btn" id="resummaryBtn">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Re-summarize this chapter
+        </button>`;
+      } else {
+        html += `<button class="summary-generate-btn" id="generateSummaryBtn">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Generate summary for this chapter
+        </button>`;
+      }
       html += '</div>';
-    }
-
-    if (S.chatBusy) {
-      html += '<div class="chat-history"><div class="chat-msg ai"><div class="chat-thinking"><span></span><span></span><span></span></div></div></div>';
     }
 
     // Navigation
@@ -2116,9 +2095,31 @@ Timeline: Key dates and events in chronological order`;
     rc.querySelectorAll('.summary-nav-btn').forEach(btn => {
       btn.addEventListener('click', () => switchChapter(S.chapter + (btn.dataset.dir === 'prev' ? -1 : 1)));
     });
+    const genBtn = $('generateSummaryBtn') || $('resummaryBtn');
+    if (genBtn) genBtn.addEventListener('click', generateCurrentChapterSummary);
 
-    if (S.chatHistory.length || S.chatBusy) $('reader').scrollTop = $('reader').scrollHeight;
-    else $('reader').scrollTop = 0;
+    $('reader').scrollTop = 0;
+  }
+
+  async function generateCurrentChapterSummary() {
+    if (!S.apiKey) { showToast('Set your OpenAI API key in Settings'); return; }
+    if (!S.book) return;
+    if (S.summaryGenerating) return;
+
+    S.summaryGenerating = true;
+    renderSummary();
+    try {
+      const result = await generateSummaryForChapter(S.chapter);
+      if (!Array.isArray(result)) throw new Error('AI returned invalid format');
+      S.aiSummary = result;
+      saveAISummary(S.chapter, result);
+      showToast('Summary generated');
+    } catch(e) {
+      showToast(e.message || 'Generation failed');
+    } finally {
+      S.summaryGenerating = false;
+      renderSummary();
+    }
   }
 
   // ========== OpenAI integration ==========
@@ -2181,42 +2182,6 @@ Rules for each section:
       { role: 'user', content: `Chapter: "${chTitle}"\n\n${chText}` }
     ];
     return await callOpenAI(messages);
-  }
-
-  // Chat message (reshapes current chapter)
-  async function sendChatMessage(userMsg) {
-    if (!S.apiKey) { showToast('Set your OpenAI API key in Settings'); return; }
-    if (S.chatBusy) return;
-
-    S.chatBusy = true;
-    S.chatHistory.push({ role: 'user', content: userMsg });
-    renderSummary();
-
-    const messages = [
-      { role: 'system', content: buildSystemPrompt() },
-      { role: 'user', content: `Chapter: "${S.book?.chapters?.[S.chapter]?.title}"\n\n${getChapterText()}` }
-    ];
-
-    // Include current summary context
-    const currentSum = S.aiSummary || getSummary(S.book?.id, S.chapter);
-    if (currentSum) {
-      messages.push({ role: 'assistant', content: JSON.stringify(Array.isArray(currentSum) ? currentSum : [currentSum]) });
-    }
-    messages.push({ role: 'user', content: `Reshape the summary based on this request: ${userMsg}` });
-
-    try {
-      const parsed = await callOpenAI(messages);
-      if (!Array.isArray(parsed)) throw new Error('Expected array of sections');
-      S.aiSummary = parsed;
-      saveAISummary(S.chapter, parsed);
-      S.chatHistory.push({ role: 'assistant', content: JSON.stringify(parsed), _display: 'Summary reshaped.' });
-    } catch(e) {
-      S.chatHistory.push({ role: 'assistant', content: '', _display: `Error: ${e.message}` });
-      showToast(e.message);
-    }
-
-    S.chatBusy = false;
-    renderSummary();
   }
 
   // Save/load AI summaries per book+chapter in localStorage
@@ -2302,26 +2267,6 @@ Rules for each section:
     if (S.readerMode === 'summary') renderSummary();
   });
 
-  // ========== Chat bar events ==========
-  $('chatSend').addEventListener('click', () => {
-    const input = $('chatInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    input.style.height = 'auto';
-    sendChatMessage(msg);
-  });
-
-  $('chatInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('chatSend').click(); }
-  });
-
-  $('chatInput').addEventListener('input', () => {
-    const el = $('chatInput');
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-  });
-
   // ========== API key ==========
   function saveApiKey(key) {
     key = (key || '').trim();
@@ -2360,14 +2305,12 @@ Rules for each section:
       btn.title = 'Switch to text view';
       renderSummary();
       $('controlsWrapper').style.display = 'none';
-      $('chatBar').classList.add('show');
     } else {
       btn.classList.remove('summary-active');
       icon.innerHTML = '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>';
       btn.title = 'Switch to visual summary';
       renderChapter();
       $('controlsWrapper').style.display = '';
-      $('chatBar').classList.remove('show');
     }
   }
 
@@ -2380,7 +2323,7 @@ Rules for each section:
     S.cur = 0;
     S.curSentence = 0;
     S.aiSummary = loadAISummary(idx);
-    S.chatHistory = [];
+    S.summaryGenerating = false;
     // Clear TTS cache for old chapter
     ttsCache.forEach(url => URL.revokeObjectURL(url));
     ttsCache.clear();
