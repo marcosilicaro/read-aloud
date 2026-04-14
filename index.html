@@ -204,7 +204,17 @@
     .badge.show { display:block; }
 
     /* ===== Visual Summary View ===== */
-    .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 100px; }
+    .summary-view { max-width:680px; margin:0 auto; padding:32px 24px 40px; }
+
+    /* In summary mode, the controls bar is hidden - collapse the reader-content
+       bottom padding (default 280px is for the fixed controls in text mode). */
+    body.summary-mode .reader-content {
+      padding-bottom: 0 !important;
+      padding-top: 0 !important;
+    }
+    body.summary-mode .reader {
+      overscroll-behavior: contain;
+    }
 
     .summary-hero {
       background: linear-gradient(135deg, var(--accent-soft), rgba(124,108,252,0.05));
@@ -808,7 +818,8 @@
       }
       body.reader-open:not(.summary-mode) #readerView.active .reader-content {
         touch-action: none;
-        padding: 16px 22px 24px;
+        /* bottom padding clears the fixed controls bar (~100px tall) */
+        padding: 16px 22px 110px;
         max-width: 100%;
         font-size: 17px;
       }
