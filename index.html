@@ -906,6 +906,155 @@
     }
     .play-indicator svg { width: 20px; height: 20px; fill: white; stroke: white; }
 
+    /* ===== Tutorial overlay (first view / refresh on mobile) ===== */
+    .tutorial-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 550;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .tutorial-overlay.show { display: flex; opacity: 1; }
+
+    [data-theme="light"] .tutorial-overlay { background: rgba(0,0,0,0.55); }
+    [data-theme="sepia"] .tutorial-overlay { background: rgba(50,40,20,0.55); }
+
+    .tutorial-card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 28px 24px 20px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transform: translateY(20px);
+      transition: transform 0.35s ease;
+    }
+    .tutorial-overlay.show .tutorial-card { transform: translateY(0); }
+
+    .tutorial-title {
+      font-family: var(--font-body);
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .tutorial-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .tutorial-gesture {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 4px;
+      border-bottom: 1px solid rgba(128,128,128,0.08);
+    }
+    .tutorial-gesture:last-of-type { border-bottom: none; }
+
+    .tutorial-icon {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .tutorial-icon svg {
+      width: 26px; height: 26px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Animated finger for gestures */
+    .tutorial-finger {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    @keyframes fingerTap {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.5); opacity: 0.5; }
+    }
+    @keyframes fingerSwipeLeft {
+      0% { transform: translateX(12px); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateX(-12px); opacity: 0; }
+    }
+    @keyframes fingerSwipeRight {
+      0% { transform: translateX(-12px); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateX(12px); opacity: 0; }
+    }
+    @keyframes fingerSwipeDown {
+      0% { transform: translateY(-12px); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+
+    .tutorial-icon.tap .tutorial-finger { animation: fingerTap 1.4s ease-in-out infinite; }
+    .tutorial-icon.swipe-left .tutorial-finger { animation: fingerSwipeLeft 1.4s ease-in-out infinite; }
+    .tutorial-icon.swipe-right .tutorial-finger { animation: fingerSwipeRight 1.4s ease-in-out infinite; }
+    .tutorial-icon.swipe-down .tutorial-finger { animation: fingerSwipeDown 1.4s ease-in-out infinite; }
+
+    .tutorial-text { flex: 1; min-width: 0; }
+    .tutorial-action { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .tutorial-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+    .tutorial-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: var(--font-ui);
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.2s;
+    }
+    .tutorial-btn:hover { box-shadow: 0 4px 16px var(--accent-glow); }
+    .tutorial-btn:active { transform: scale(0.98); }
+
+    .tutorial-dont-show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      cursor: pointer;
+      padding: 6px;
+      user-select: none;
+    }
+    .tutorial-dont-show input { accent-color: var(--accent); }
+
     /* Loading spinner */
     .loading { display:flex; align-items:center; justify-content:center; padding:40px; }
     .spinner {
@@ -1176,6 +1325,59 @@ service cloud.firestore {
   <div class="reveal-hint"></div>
   <div class="tap-feedback" id="tapFeedback"><svg viewBox="0 0 24 24" id="tapFeedbackIcon"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
   <div class="play-indicator"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+
+  <!-- Tutorial overlay (shown on first mobile view / on refresh) -->
+  <div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-card">
+      <div class="tutorial-title">Quick Guide</div>
+      <div class="tutorial-subtitle">Control playback with gestures on the text</div>
+
+      <div class="tutorial-gesture">
+        <div class="tutorial-icon tap">
+          <div class="tutorial-finger"></div>
+        </div>
+        <div class="tutorial-text">
+          <div class="tutorial-action">Tap</div>
+          <div class="tutorial-desc">Play or pause</div>
+        </div>
+      </div>
+
+      <div class="tutorial-gesture">
+        <div class="tutorial-icon swipe-left">
+          <div class="tutorial-finger"></div>
+        </div>
+        <div class="tutorial-text">
+          <div class="tutorial-action">Swipe left</div>
+          <div class="tutorial-desc">Next paragraph</div>
+        </div>
+      </div>
+
+      <div class="tutorial-gesture">
+        <div class="tutorial-icon swipe-right">
+          <div class="tutorial-finger"></div>
+        </div>
+        <div class="tutorial-text">
+          <div class="tutorial-action">Swipe right</div>
+          <div class="tutorial-desc">Previous paragraph</div>
+        </div>
+      </div>
+
+      <div class="tutorial-gesture">
+        <div class="tutorial-icon swipe-down">
+          <div class="tutorial-finger"></div>
+        </div>
+        <div class="tutorial-text">
+          <div class="tutorial-action">Swipe down or up</div>
+          <div class="tutorial-desc">Show controls and menu</div>
+        </div>
+      </div>
+
+      <button class="tutorial-btn" id="tutorialDismiss">Got it</button>
+      <label class="tutorial-dont-show">
+        <input type="checkbox" id="tutorialDontShow"> Don't show again
+      </label>
+    </div>
+  </div>
 
 <script>
 (() => {
@@ -1700,7 +1902,37 @@ service cloud.firestore {
     await loadSummaries();
     S.aiSummary = loadAISummary(S.chapter);
     renderChapter();
+
+    // Show tutorial on mobile (once per session, unless "don't show" was saved)
+    maybeShowTutorial();
   }
+
+  // ========== Tutorial ==========
+  function isMobile() { return window.matchMedia('(max-width: 768px)').matches; }
+
+  function maybeShowTutorial() {
+    if (!isMobile()) return;
+    // If user permanently dismissed it (localStorage), never show
+    if (load('tutorialHidden') === 'true') return;
+    // If already shown this session, don't show again
+    try {
+      if (sessionStorage.getItem('ra3-tutorialShown')) return;
+      sessionStorage.setItem('ra3-tutorialShown', '1');
+    } catch(e) {}
+    // Show with a tiny delay so the chapter renders first
+    setTimeout(() => $('tutorialOverlay').classList.add('show'), 400);
+  }
+
+  function hideTutorial() {
+    const dontShow = $('tutorialDontShow').checked;
+    if (dontShow) save('tutorialHidden', 'true');
+    $('tutorialOverlay').classList.remove('show');
+  }
+
+  $('tutorialDismiss').addEventListener('click', hideTutorial);
+  $('tutorialOverlay').addEventListener('click', e => {
+    if (e.target === $('tutorialOverlay')) hideTutorial();
+  });
 
   // ========== Summaries ==========
   async function loadSummaries() {
