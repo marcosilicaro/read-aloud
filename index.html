@@ -428,6 +428,134 @@
     .process-progress-log .log-ok { color:#3ecfb0; }
     .process-progress-log .log-err { color:var(--danger); }
 
+    /* ===== Account section ===== */
+    .account-box {
+      background: linear-gradient(135deg, var(--accent-soft), rgba(62,207,176,0.08));
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(128,128,128,0.08);
+    }
+
+    .account-signed-out, .account-signed-in { display:none; }
+    .account-box.signed-out .account-signed-out { display:block; }
+    .account-box.signed-in .account-signed-in { display:block; }
+
+    .account-title {
+      font-size:14px; font-weight:600; margin-bottom:4px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .account-subtitle { font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:1.5; }
+
+    .google-signin-btn {
+      width:100%; padding:10px 16px; border-radius:var(--radius-sm); border:none;
+      background:#fff; color:#1f1f1f; cursor:pointer;
+      font-size:14px; font-weight:500; font-family:var(--font-ui);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.12);
+    }
+    .google-signin-btn:hover { box-shadow:0 2px 8px rgba(0,0,0,0.16); }
+    .google-signin-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .google-signin-btn svg { width:18px; height:18px; }
+
+    .setup-firebase-btn {
+      width:100%; padding:10px 16px; border-radius:var(--radius-sm); border:none;
+      background:var(--surface-2); color:var(--text); cursor:pointer;
+      font-size:13px; font-family:var(--font-ui); transition:all 0.2s;
+      margin-top:8px;
+    }
+    .setup-firebase-btn:hover { background:var(--surface-hover); }
+
+    .user-info {
+      display:flex; align-items:center; gap:12px; margin-bottom:12px;
+    }
+    .user-avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:var(--accent); color:white;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600; font-size:16px; flex-shrink:0;
+      background-size:cover; background-position:center;
+    }
+    .user-details { flex:1; min-width:0; }
+    .user-name { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-email { font-size:12px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .sync-status {
+      font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:6px;
+      margin-top:8px;
+    }
+    .sync-status .sync-dot {
+      width:8px; height:8px; border-radius:50%; background:#3ecfb0;
+    }
+    .sync-status.syncing .sync-dot { background:var(--accent); animation:chatPulse 1s ease-in-out infinite; }
+    .sync-status.error .sync-dot { background:var(--danger); }
+
+    .sign-out-btn {
+      width:100%; padding:8px 16px; border-radius:var(--radius-sm); border:1px solid rgba(128,128,128,0.15);
+      background:none; color:var(--text-secondary); cursor:pointer;
+      font-size:12px; font-family:var(--font-ui); transition:all 0.2s;
+    }
+    .sign-out-btn:hover { background:var(--surface-hover); color:var(--text); }
+
+    /* Firebase setup modal */
+    .setup-modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+      z-index:600; align-items:center; justify-content:center; padding:20px;
+    }
+    .setup-modal-overlay.show { display:flex; }
+
+    .setup-modal {
+      background:var(--surface); border-radius:var(--radius); max-width:520px; width:100%;
+      max-height:90vh; overflow-y:auto;
+    }
+    .setup-modal-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 20px; border-bottom:1px solid rgba(128,128,128,0.1);
+      position:sticky; top:0; background:var(--surface); z-index:1;
+    }
+    .setup-modal-header h3 { font-size:16px; font-weight:600; }
+    .setup-modal-body { padding:20px; }
+
+    .setup-step {
+      margin-bottom:16px; padding-left:28px; position:relative;
+    }
+    .setup-step-num {
+      position:absolute; left:0; top:0;
+      width:22px; height:22px; border-radius:50%;
+      background:var(--accent-soft); color:var(--accent);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:600; font-size:12px;
+    }
+    .setup-step-title { font-size:13px; font-weight:600; margin-bottom:4px; }
+    .setup-step-body { font-size:12px; color:var(--text-secondary); line-height:1.6; }
+    .setup-step-body a { color:var(--accent); text-decoration:none; }
+    .setup-step-body a:hover { text-decoration:underline; }
+    .setup-step-body code {
+      background:var(--surface-2); padding:2px 6px; border-radius:4px;
+      font-family:Consolas, monospace; font-size:11px;
+    }
+
+    .firebase-config-textarea {
+      width:100%; min-height:140px; padding:12px; border-radius:var(--radius-sm);
+      border:1px solid rgba(128,128,128,0.15); background:var(--surface-2);
+      color:var(--text); font-size:11px; font-family:Consolas, monospace;
+      line-height:1.5; outline:none; resize:vertical; margin-top:12px;
+    }
+    .firebase-config-textarea:focus { border-color:var(--accent); }
+
+    .setup-modal-actions {
+      display:flex; gap:8px; margin-top:16px;
+    }
+    .setup-modal-actions button {
+      flex:1; padding:10px 16px; border-radius:var(--radius-sm); border:none;
+      font-size:13px; font-family:var(--font-ui); cursor:pointer; transition:all 0.2s;
+    }
+    .setup-modal-cancel { background:var(--surface-2); color:var(--text-muted); }
+    .setup-modal-cancel:hover { background:var(--surface-hover); color:var(--text); }
+    .setup-modal-save { background:var(--accent); color:white; }
+    .setup-modal-save:hover { box-shadow:0 2px 12px var(--accent-glow); }
+    .setup-modal-save:disabled { opacity:0.5; cursor:not-allowed; }
+
     /* Reader area */
     .reader { flex:1; overflow-y:auto; overflow-x:hidden; scroll-behavior:smooth; overscroll-behavior:contain; }
     .reader-content { max-width:680px; margin:0 auto; padding:32px 24px 280px; }
@@ -735,6 +863,31 @@
   <div class="panel panel-right" id="settingsPanel" style="width:380px">
     <div class="panel-header"><h3>Settings</h3><button class="icon-btn" id="settingsClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="panel-body">
+
+      <!-- Account -->
+      <div class="account-box signed-out" id="accountBox">
+        <div class="account-signed-out">
+          <div class="account-title">Cloud Sync</div>
+          <div class="account-subtitle">Sign in to save your progress, bookmarks, API key, and AI summaries across all your devices.</div>
+          <button class="google-signin-btn" id="googleSignInBtn" disabled>
+            <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+            Sign in with Google
+          </button>
+          <button class="setup-firebase-btn" id="setupFirebaseBtn">Configure Firebase (one-time setup)</button>
+        </div>
+        <div class="account-signed-in">
+          <div class="user-info">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">User</div>
+              <div class="user-email" id="userEmail">-</div>
+            </div>
+          </div>
+          <div class="sync-status" id="syncStatus"><div class="sync-dot"></div><span>Synced</span></div>
+          <button class="sign-out-btn" id="signOutBtn" style="margin-top:10px">Sign out</button>
+        </div>
+      </div>
+
       <div class="setting-row"><span class="setting-label">Theme</span><div class="setting-control"><button class="theme-btn active" data-t="dark"></button><button class="theme-btn" data-t="light"></button><button class="theme-btn" data-t="sepia"></button></div></div>
       <div class="setting-row"><span class="setting-label">Font Size</span><div class="setting-control"><button class="font-btn" id="fontDown">A-</button><span class="font-size-label" id="fontSizeLabel">16</span><button class="font-btn" id="fontUp">A+</button></div></div>
       <div class="setting-row"><span class="setting-label">Voice</span><div class="setting-control" style="flex:1;margin-left:12px"><select class="voice-select" id="voiceSelect">
@@ -787,6 +940,80 @@
     </div>
   </div>
 
+  <!-- Firebase setup modal -->
+  <div class="setup-modal-overlay" id="setupModalOverlay">
+    <div class="setup-modal">
+      <div class="setup-modal-header">
+        <h3>Firebase Setup</h3>
+        <button class="icon-btn" id="setupModalClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="setup-modal-body">
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;line-height:1.5">
+          Firebase is a free Google service that stores your data and handles sign-in. You'll create your own project (5 min, free forever for personal use), so your data stays in your own account.
+        </p>
+
+        <div class="setup-step">
+          <div class="setup-step-num">1</div>
+          <div class="setup-step-title">Create a Firebase project</div>
+          <div class="setup-step-body">Go to <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a> → <b>Add project</b>. Give it any name (e.g. "read-aloud"). You can skip Google Analytics.</div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">2</div>
+          <div class="setup-step-title">Enable Google Sign-In</div>
+          <div class="setup-step-body">In your project → <b>Build → Authentication → Get started → Sign-in method → Google → Enable</b>. Pick a support email and save.</div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">3</div>
+          <div class="setup-step-title">Create Firestore database</div>
+          <div class="setup-step-body"><b>Build → Firestore Database → Create database → Start in production mode → pick a location</b>. Then go to the <b>Rules</b> tab and paste this (only lets each user read/write their own data):
+          <br><code style="display:block;white-space:pre-wrap;padding:10px;margin-top:6px">rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}</code>
+          Click <b>Publish</b>.</div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">4</div>
+          <div class="setup-step-title">Register a Web app</div>
+          <div class="setup-step-body">Project Settings (gear icon top-left) → scroll to <b>Your apps</b> → click the <b>&lt;/&gt;</b> (Web) icon → give it any nickname → <b>Register app</b>. You'll see a <code>firebaseConfig</code> object. Copy it.</div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">5</div>
+          <div class="setup-step-title">Add this app's domain to authorized domains</div>
+          <div class="setup-step-body">In <b>Authentication → Settings → Authorized domains</b>, add any domain you'll use the app from (e.g. <code>localhost</code> is already there; add <code>192.168.1.172</code> or your Cloudflare Pages domain if you deploy).</div>
+        </div>
+
+        <div class="setup-step">
+          <div class="setup-step-num">6</div>
+          <div class="setup-step-title">Paste the firebaseConfig below</div>
+          <div class="setup-step-body">Paste the entire <code>firebaseConfig = {...}</code> object here. The app parses it.</div>
+        </div>
+
+        <textarea class="firebase-config-textarea" id="firebaseConfigInput" placeholder='const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};'></textarea>
+
+        <div class="setup-modal-actions">
+          <button class="setup-modal-cancel" id="setupModalCancel">Cancel</button>
+          <button class="setup-modal-save" id="setupModalSave">Save &amp; Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Confirm dialog -->
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-box">
@@ -833,6 +1060,14 @@
     chatHistory: [],    // [{role,content}] for current chapter
     aiSummary: null,    // AI-generated summary for current chapter
     chatBusy: false,
+    // Cloud sync
+    firebaseConfig: null,
+    firebaseApp: null,
+    firebaseAuth: null,
+    firebaseDb: null,
+    user: null,
+    fbReady: false,
+    fbListeners: [],
   };
 
   const $ = id => document.getElementById(id);
@@ -852,8 +1087,265 @@
   function esc(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
   function splitSentences(t) { const m=t.match(/[^.!?]*[.!?]+[\s]?|[^.!?]+$/g); return m?m.map(s=>s.trim()).filter(Boolean):[t]; }
   function showToast(msg) { const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),1800); }
-  function save(k,v) { try{localStorage.setItem('ra3-'+k,typeof v==='object'?JSON.stringify(v):v);}catch(e){} }
+  function save(k,v) {
+    try{localStorage.setItem('ra3-'+k,typeof v==='object'?JSON.stringify(v):v);}catch(e){}
+    // Trigger cloud sync for synced keys
+    if (S.user && SYNCED_KEYS.has(k)) scheduleSyncUp();
+    // Per-book keys (bookmarks, ai summaries, progress)
+    if (S.user && (k.startsWith('bm-') || k.startsWith('aisum-') || k === 'progress')) scheduleSyncUp();
+  }
   function load(k) { try{return localStorage.getItem('ra3-'+k);}catch(e){return null;} }
+
+  // ========== Firebase Cloud Sync ==========
+  const FB_VER = '10.7.0';
+  const SYNCED_KEYS = new Set([
+    'apiKey', 'instructions', 'theme', 'fontSize', 'speed', 'voice', 'progress'
+  ]);
+  let fbMods = null; // cached SDK modules
+
+  async function loadFirebaseSDK() {
+    if (fbMods) return fbMods;
+    const [appMod, authMod, dbMod] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-auth.js`),
+      import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-firestore.js`),
+    ]);
+    fbMods = {
+      initializeApp: appMod.initializeApp,
+      getAuth: authMod.getAuth,
+      GoogleAuthProvider: authMod.GoogleAuthProvider,
+      signInWithPopup: authMod.signInWithPopup,
+      signOut: authMod.signOut,
+      onAuthStateChanged: authMod.onAuthStateChanged,
+      getFirestore: dbMod.getFirestore,
+      doc: dbMod.doc,
+      getDoc: dbMod.getDoc,
+      setDoc: dbMod.setDoc,
+      onSnapshot: dbMod.onSnapshot,
+    };
+    return fbMods;
+  }
+
+  function parseFirebaseConfig(text) {
+    // Accept: full JS snippet, or just {...}, or JSON
+    // Strip "const firebaseConfig = " and trailing ";"
+    const cleaned = text.trim()
+      .replace(/^const\s+\w+\s*=\s*/, '')
+      .replace(/;?\s*$/, '');
+    // Replace single quotes with double quotes for JSON
+    try {
+      // Try as JSON first
+      return JSON.parse(cleaned);
+    } catch(e) {
+      // Fall back: evaluate as JS literal (safe since we only eval object literals)
+      try {
+        const obj = new Function('return ' + cleaned)();
+        if (typeof obj === 'object' && obj.apiKey && obj.authDomain && obj.projectId) return obj;
+        throw new Error('Invalid config');
+      } catch(e2) {
+        throw new Error('Could not parse firebaseConfig. Make sure it includes apiKey, authDomain, projectId, etc.');
+      }
+    }
+  }
+
+  async function initFirebase() {
+    if (S.fbReady) return;
+    const cfg = load('firebaseConfig');
+    if (!cfg) return;
+
+    let parsed;
+    try { parsed = JSON.parse(cfg); } catch(e) { return; }
+
+    try {
+      const mods = await loadFirebaseSDK();
+      S.firebaseApp = mods.initializeApp(parsed);
+      S.firebaseAuth = mods.getAuth(S.firebaseApp);
+      S.firebaseDb = mods.getFirestore(S.firebaseApp);
+      S.fbReady = true;
+
+      // Enable the Google Sign-In button
+      $('googleSignInBtn').disabled = false;
+
+      // Listen for auth changes
+      mods.onAuthStateChanged(S.firebaseAuth, user => {
+        S.user = user || null;
+        updateAccountUI();
+        if (user) {
+          startCloudSync();
+        } else {
+          stopCloudSync();
+        }
+      });
+    } catch(e) {
+      console.error('Firebase init failed:', e);
+      showToast('Firebase init failed: ' + e.message);
+    }
+  }
+
+  async function signInWithGoogle() {
+    if (!S.fbReady) { showToast('Firebase not configured'); return; }
+    try {
+      const provider = new fbMods.GoogleAuthProvider();
+      await fbMods.signInWithPopup(S.firebaseAuth, provider);
+    } catch(e) {
+      if (e.code !== 'auth/popup-closed-by-user') {
+        showToast('Sign in failed: ' + (e.message || e.code));
+      }
+    }
+  }
+
+  async function signOutCurrentUser() {
+    if (!S.fbReady) return;
+    try { await fbMods.signOut(S.firebaseAuth); } catch(e) {}
+  }
+
+  function updateAccountUI() {
+    const box = $('accountBox');
+    if (S.user) {
+      box.classList.remove('signed-out'); box.classList.add('signed-in');
+      $('userName').textContent = S.user.displayName || 'User';
+      $('userEmail').textContent = S.user.email || '';
+      const av = $('userAvatar');
+      if (S.user.photoURL) {
+        av.style.backgroundImage = `url("${S.user.photoURL}")`;
+        av.textContent = '';
+      } else {
+        av.style.backgroundImage = '';
+        av.textContent = (S.user.displayName || S.user.email || 'U').charAt(0).toUpperCase();
+      }
+    } else {
+      box.classList.remove('signed-in'); box.classList.add('signed-out');
+    }
+  }
+
+  // ----- Sync layer -----
+  let cloudUnsubscribe = null;
+  let syncUpTimer = null;
+  let applyingCloudData = false; // avoid feedback loops
+
+  async function startCloudSync() {
+    if (!S.user || !S.firebaseDb) return;
+    const userDoc = fbMods.doc(S.firebaseDb, 'users', S.user.uid);
+
+    // Initial pull
+    try {
+      setSyncStatus('syncing', 'Loading...');
+      const snap = await fbMods.getDoc(userDoc);
+      if (snap.exists()) {
+        applyCloudData(snap.data());
+      } else {
+        // First login: push current local data to cloud
+        await pushLocalToCloud();
+      }
+      setSyncStatus('ok', 'Synced');
+    } catch(e) {
+      console.error(e);
+      setSyncStatus('error', 'Sync error: ' + e.message);
+    }
+
+    // Listen for remote changes
+    cloudUnsubscribe = fbMods.onSnapshot(userDoc, snap => {
+      if (snap.metadata.hasPendingWrites) return; // ignore our own writes
+      if (snap.exists()) applyCloudData(snap.data());
+    }, err => {
+      console.error('Snapshot error:', err);
+      setSyncStatus('error', 'Sync error');
+    });
+  }
+
+  function stopCloudSync() {
+    if (cloudUnsubscribe) { cloudUnsubscribe(); cloudUnsubscribe = null; }
+  }
+
+  function applyCloudData(data) {
+    applyingCloudData = true;
+    try {
+      // Simple settings
+      if (data.apiKey !== undefined && data.apiKey !== load('apiKey')) {
+        save('apiKey', data.apiKey);
+        $('apiKeyInput').value = data.apiKey || '';
+        S.apiKey = data.apiKey || null;
+        $('apiKeyDot').className = 'api-key-dot ' + (data.apiKey ? 'set' : 'unset');
+        $('apiKeyStatus').textContent = data.apiKey ? 'Key saved' : 'Not set';
+      }
+      if (data.instructions !== undefined) {
+        save('instructions', data.instructions);
+        if ($('instructionsInput')) $('instructionsInput').value = data.instructions;
+      }
+      if (data.theme) { save('theme', data.theme); document.body.dataset.theme = data.theme; S.theme = data.theme; document.querySelectorAll('.theme-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===data.theme)); }
+      if (data.fontSize) { save('fontSize', data.fontSize); document.documentElement.style.setProperty('--font-size', data.fontSize+'px'); $('fontSizeLabel').textContent = data.fontSize; S.fontSize = parseInt(data.fontSize); }
+      if (data.speed) { S.speed = parseFloat(data.speed); $('speedLabel').textContent = S.speed+'x'; save('speed', data.speed); }
+      if (data.voice) { S.voiceURI = data.voice; $('voiceSelect').value = data.voice; save('voice', data.voice); }
+
+      // Progress
+      if (data.progress) {
+        save('progress', data.progress);
+      }
+
+      // Per-book collections (bookmarks, aiSummaries)
+      if (data.bookmarks) {
+        Object.keys(data.bookmarks).forEach(bookId => {
+          save('bm-' + bookId, data.bookmarks[bookId]);
+        });
+      }
+      if (data.aiSummaries) {
+        Object.keys(data.aiSummaries).forEach(bookId => {
+          save('aisum-' + bookId, data.aiSummaries[bookId]);
+        });
+      }
+    } finally {
+      applyingCloudData = false;
+    }
+  }
+
+  function scheduleSyncUp() {
+    if (applyingCloudData) return;
+    if (!S.user || !S.firebaseDb) return;
+    clearTimeout(syncUpTimer);
+    syncUpTimer = setTimeout(pushLocalToCloud, 1500);
+  }
+
+  async function pushLocalToCloud() {
+    if (!S.user || !S.firebaseDb) return;
+    try {
+      setSyncStatus('syncing', 'Saving...');
+      const data = {};
+      // Simple keys
+      for (const k of SYNCED_KEYS) {
+        const v = load(k);
+        if (v !== null) data[k] = v;
+      }
+      // Collections: bookmarks and aiSummaries
+      const bookmarks = {};
+      const aiSummaries = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const fullKey = localStorage.key(i);
+        if (!fullKey.startsWith('ra3-')) continue;
+        const k = fullKey.substring(4);
+        if (k.startsWith('bm-')) bookmarks[k.substring(3)] = localStorage.getItem(fullKey);
+        else if (k.startsWith('aisum-')) {
+          try { aiSummaries[k.substring(6)] = JSON.parse(localStorage.getItem(fullKey)); } catch(e) {}
+        }
+      }
+      if (Object.keys(bookmarks).length) data.bookmarks = bookmarks;
+      if (Object.keys(aiSummaries).length) data.aiSummaries = aiSummaries;
+
+      data._updatedAt = Date.now();
+
+      const userDoc = fbMods.doc(S.firebaseDb, 'users', S.user.uid);
+      await fbMods.setDoc(userDoc, data, { merge: true });
+      setSyncStatus('ok', 'Synced');
+    } catch(e) {
+      console.error(e);
+      setSyncStatus('error', 'Sync error');
+    }
+  }
+
+  function setSyncStatus(state, text) {
+    const el = $('syncStatus');
+    el.className = 'sync-status' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+    el.lastChild.textContent = text;
+  }
 
   // ========== IndexedDB for books ==========
   let db;
@@ -1904,6 +2396,39 @@ Rules for each section:
   $('settingsClose').addEventListener('click',closeAllPanels);
   $('viewToggleBtn').addEventListener('click', toggleReaderMode);
 
+  // ========== Account / Firebase setup ==========
+  $('googleSignInBtn').addEventListener('click', signInWithGoogle);
+  $('signOutBtn').addEventListener('click', signOutCurrentUser);
+
+  $('setupFirebaseBtn').addEventListener('click', () => {
+    // Pre-fill with existing config if any
+    const existing = load('firebaseConfig');
+    if (existing) {
+      try { $('firebaseConfigInput').value = JSON.stringify(JSON.parse(existing), null, 2); } catch(e) {}
+    }
+    $('setupModalOverlay').classList.add('show');
+  });
+  $('setupModalClose').addEventListener('click', () => $('setupModalOverlay').classList.remove('show'));
+  $('setupModalCancel').addEventListener('click', () => $('setupModalOverlay').classList.remove('show'));
+  $('setupModalOverlay').addEventListener('click', e => {
+    if (e.target === $('setupModalOverlay')) $('setupModalOverlay').classList.remove('show');
+  });
+
+  $('setupModalSave').addEventListener('click', async () => {
+    const text = $('firebaseConfigInput').value.trim();
+    if (!text) { showToast('Paste your firebaseConfig first'); return; }
+    try {
+      const parsed = parseFirebaseConfig(text);
+      save('firebaseConfig', JSON.stringify(parsed));
+      $('setupModalOverlay').classList.remove('show');
+      showToast('Firebase configured. Initializing...');
+      await initFirebase();
+      showToast('Ready! Tap "Sign in with Google"');
+    } catch(e) {
+      showToast(e.message);
+    }
+  });
+
   // ========== Upload / Import ==========
   $('fileInput').addEventListener('change',()=>{if($('fileInput').files.length)handleUpload($('fileInput').files[0]);$('fileInput').value='';});
 
@@ -2101,6 +2626,11 @@ Rules for each section:
     } catch(e) {}
 
     renderLibrary();
+
+    // Initialize Firebase if configured
+    if (load('firebaseConfig')) {
+      initFirebase().catch(e => console.error('Firebase init error:', e));
+    }
   }
 
   init();
