@@ -10,6 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4D6;</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400;7..72,500;7..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #121218;
@@ -1053,6 +1054,648 @@
 
     /* Hidden file input */
     #fileInput { display:none; }
+
+    /* =======================================================================
+       READING ROOM SKIN
+       Warm, literary, paper-feel redesign — layered on top of the base styles
+       so all existing JS selectors (.seg, .sentence, .meta-chip, panels, etc.)
+       keep working. Only colors, typography, and a few key components change.
+       ======================================================================= */
+
+    :root {
+      /* Warm paper palette (default/light) */
+      --bg:            oklch(0.965 0.012 85);
+      --surface:       oklch(0.935 0.016 80);
+      --surface-2:     oklch(0.945 0.014 82);
+      --surface-hover: oklch(0.905 0.02 82);
+      --text:          oklch(0.22 0.02 55);
+      --text-secondary:oklch(0.40 0.02 55);
+      --text-muted:    oklch(0.58 0.02 55);
+      --accent:        oklch(0.52 0.14 40);
+      --accent-soft:   oklch(0.52 0.14 40 / 0.12);
+      --accent-glow:   oklch(0.52 0.14 40 / 0.22);
+      --highlight:     oklch(0.85 0.09 85 / 0.70);
+      --rule:          oklch(0.22 0.02 55 / 0.12);
+
+      --speaker-1: oklch(0.45 0.14 40);
+      --speaker-2: oklch(0.42 0.1 200);
+      --speaker-3: oklch(0.40 0.11 140);
+      --speaker-4: oklch(0.42 0.13 320);
+
+      --font-body:    'Lora','Iowan Old Style',Georgia,serif;
+      --font-ui:      'Lora',Georgia,serif;
+      --font-display: 'Instrument Serif','Lora',Georgia,serif;
+      --font-mono:    'Geist Mono','SF Mono','Menlo',ui-monospace,monospace;
+
+      --shadow: 0 8px 28px rgba(60,40,20,0.10);
+    }
+
+    /* Dark / "Lamp" — warm lamplit study */
+    [data-theme="dark"] {
+      --bg:            oklch(0.15 0.01 60);
+      --surface:       oklch(0.19 0.014 60);
+      --surface-2:     oklch(0.22 0.014 60);
+      --surface-hover: oklch(0.26 0.016 60);
+      --text:          oklch(0.93 0.015 75);
+      --text-secondary:oklch(0.75 0.018 75);
+      --text-muted:    oklch(0.55 0.018 75);
+      --accent:        oklch(0.72 0.13 50);
+      --accent-soft:   oklch(0.72 0.13 50 / 0.16);
+      --accent-glow:   oklch(0.72 0.13 50 / 0.26);
+      --highlight:     oklch(0.72 0.13 50 / 0.26);
+      --rule:          oklch(0.93 0.015 75 / 0.12);
+      --speaker-1: oklch(0.82 0.13 55);
+      --speaker-2: oklch(0.82 0.10 200);
+      --speaker-3: oklch(0.85 0.10 110);
+      --speaker-4: oklch(0.82 0.10 330);
+      --shadow: 0 8px 28px rgba(0,0,0,0.45);
+    }
+
+    /* Sepia — warmer parchment */
+    [data-theme="sepia"] {
+      --bg:            oklch(0.94 0.035 85);
+      --surface:       oklch(0.97 0.028 85);
+      --surface-2:     oklch(0.92 0.04 82);
+      --surface-hover: oklch(0.89 0.045 82);
+      --text:          oklch(0.28 0.04 55);
+      --text-secondary:oklch(0.45 0.04 55);
+      --text-muted:    oklch(0.60 0.04 55);
+      --accent:        oklch(0.50 0.13 50);
+      --accent-soft:   oklch(0.50 0.13 50 / 0.12);
+      --accent-glow:   oklch(0.50 0.13 50 / 0.22);
+      --highlight:     oklch(0.84 0.11 80 / 0.70);
+      --rule:          oklch(0.28 0.04 55 / 0.14);
+    }
+
+    body {
+      font-family: var(--font-body);
+    }
+
+    /* Paper grain — barely-there noise over the whole app.
+       z-index 1 sits above view content but below panels (201) / modals. */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.28;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.15  0 0 0 0 0.1  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+    [data-theme="dark"] body::before {
+      mix-blend-mode: screen;
+      opacity: 0.20;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.8  0 0 0 0 0.7  0 0 0 0 0.6  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    /* ───────── Library header / masthead ───────── */
+    .lib-header {
+      background: transparent;
+      border-bottom: 0;
+      padding: 12px 20px 0;
+    }
+    .lib-header h1 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 0;
+      color: var(--text-muted);
+    }
+
+    .lib-masthead {
+      padding: 14px 20px 20px;
+      margin: 0 4px 18px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .lib-masthead .kicker {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .lib-masthead h2 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .lib-masthead h2 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* Continue-reading hero (prepended by renderLibrary) */
+    .continue-hero {
+      position: relative;
+      border: 1px solid var(--rule);
+      border-radius: 22px;
+      padding: 20px 22px 18px;
+      margin: 0 4px 22px;
+      background: var(--surface-2);
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .continue-hero:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .continue-hero .hero-kicker {
+      font-family: var(--font-mono);
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .continue-hero .hero-kicker .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: rr-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes rr-pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%     { opacity: 0.4; transform: scale(0.7); }
+    }
+    .continue-hero h2 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.005em;
+      margin-bottom: 4px;
+      padding-right: 64px;
+    }
+    .continue-hero .hero-author {
+      font-style: italic;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+    .continue-hero .hero-excerpt {
+      font-size: 13px; line-height: 1.55;
+      color: var(--text-secondary);
+      font-style: italic;
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+    .continue-hero .hero-progress {
+      display: flex; align-items: center; gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    .continue-hero .hero-progress .bar {
+      flex: 1; height: 2px;
+      background: var(--rule);
+      position: relative; overflow: hidden;
+    }
+    .continue-hero .hero-progress .bar .fill {
+      position: absolute; top:0; left:0; bottom:0;
+      background: var(--accent);
+    }
+    .continue-hero .play-pill {
+      position: absolute;
+      right: 18px; top: 18px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #faf3e7;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 22px var(--accent-glow);
+      transition: transform 0.15s ease;
+    }
+    .continue-hero:hover .play-pill { transform: scale(1.06); }
+    .continue-hero .play-pill svg {
+      width: 18px; height: 18px; fill: currentColor; margin-left: 2px;
+      stroke: none;
+    }
+
+    /* Stats strip */
+    .lib-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      margin: 0 4px 22px;
+    }
+    .lib-stats .stat { padding: 14px 10px; text-align: center; }
+    .lib-stats .stat + .stat { border-left: 1px solid var(--rule); }
+    .lib-stats .num {
+      font-family: var(--font-display);
+      font-size: 26px; line-height: 1;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+    .lib-stats .num em {
+      font-style: italic;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+    .lib-stats .lbl {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Library section title — editorial shelf label */
+    .lib-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 10px;
+      margin: 22px 4px 14px;
+      font-weight: 500;
+    }
+    .lib-section-title::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: var(--rule);
+    }
+
+    /* Book cards — softer, paper-like */
+    .book-card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+    }
+    .book-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+    }
+    .book-title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: -0.005em;
+    }
+    .book-author { font-style: italic; }
+
+    .upload-card {
+      background: transparent;
+      border: 1.5px dashed var(--rule);
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .upload-card:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* ───────── Reader ───────── */
+    .reader-header h1 {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+    }
+
+    /* Chapter flourish — prepended by renderChapter */
+    .ch-head {
+      margin: 8px auto 28px;
+      text-align: center;
+      max-width: 640px;
+    }
+    .ch-head .num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .ch-head .num .flourish {
+      display: inline-block;
+      width: 36px; height: 1px;
+      background: currentColor;
+      margin: 0 10px;
+      vertical-align: middle;
+      opacity: 0.5;
+    }
+    .ch-head h2 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 26px;
+      line-height: 1.15;
+      letter-spacing: -0.005em;
+      color: var(--text);
+    }
+
+    /* Segments */
+    .seg {
+      margin-bottom: 22px;
+      padding: 4px 0 !important;
+      border-left: 0 !important;
+      border-radius: 0;
+      background: transparent !important;
+    }
+    .seg:hover { background: transparent !important; }
+    .seg.active { background: transparent !important; border-left: 0 !important; }
+    .seg.bookmarked::before {
+      top: 8px; right: -4px;
+      width: 6px; height: 6px;
+      background: var(--accent);
+    }
+
+    /* Speaker label — editorial serif italic */
+    .seg-speaker {
+      font-family: var(--font-display) !important;
+      font-style: italic !important;
+      font-size: 15px !important;
+      font-weight: 400 !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      margin-bottom: 6px !important;
+      color: var(--speaker-1);
+    }
+    .seg-speaker .ts {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-style: normal;
+      opacity: 0.5;
+      letter-spacing: 0.04em;
+    }
+
+    /* Body text — literary serif */
+    .seg-body {
+      font-family: var(--font-body);
+      letter-spacing: -0.003em;
+      text-wrap: pretty;
+    }
+
+    /* Drop cap on the very first segment of each chapter */
+    .seg.first-seg .seg-body::first-letter {
+      font-family: var(--font-display);
+      font-size: 3.4em;
+      float: left;
+      line-height: 0.85;
+      padding: 6px 8px 0 0;
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    /* Ink-highlight sentence.
+       - Paused: a thin warm underline marks where the reader is.
+       - Playing: the highlight fills the full sentence height, drawing left
+         to right over the sentence's speaking duration.
+       Padding + negative margin lets the playing fill span full line-height
+       without disturbing layout; box-decoration-break fills wrapped lines. */
+    .seg-body .sentence {
+      position: relative;
+      transition: color 0.3s ease;
+      padding: 0;
+    }
+    .seg.active .sentence.current,
+    body.reader-open:not(.summary-mode) .seg.active .sentence.current {
+      background-image: linear-gradient(var(--accent), var(--accent)) !important;
+      background-repeat: no-repeat !important;
+      background-position: 0 100% !important;
+      background-size: 100% 1.5px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    body.is-playing .seg.active .sentence.current,
+    body.is-playing.reader-open:not(.summary-mode) .seg.active .sentence.current {
+      background-image: linear-gradient(var(--highlight), var(--highlight)) !important;
+      background-position: 0 0 !important;
+      background-size: 0% 100%;
+      padding: 0.36em 0.1em !important;
+      margin: -0.36em -0.1em !important;
+      border-radius: 4px !important;
+      animation: rr-drawInk var(--sent-ms, 2600ms) linear forwards !important;
+    }
+    @keyframes rr-drawInk {
+      from { background-size: 0% 100%; }
+      to   { background-size: 100% 100%; }
+    }
+
+    /* Focus-dim already exists in base; keep it and soften the transition */
+    body.reader-open:not(.summary-mode) .seg {
+      transition: opacity 0.6s ease !important;
+    }
+
+    /* ───────── Bottom pill controls ───────── */
+    .controls-wrapper {
+      background: transparent;
+      border-top: 0;
+      padding-bottom: max(18px, env(safe-area-inset-bottom));
+    }
+    .controls-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--bg) 55%, color-mix(in oklch, var(--bg) 75%, transparent) 85%, transparent);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .progress-bar { padding-top: 14px; }
+    .progress-track { background: var(--rule); height: 2px; }
+    .progress-bar:hover .progress-track { height: 3px; }
+    .progress-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+    }
+    .controls { padding: 6px 0 2px; gap: 6px; }
+    .ctrl { color: var(--text-secondary); }
+    .ctrl.play-btn {
+      background: var(--text);
+      color: var(--bg);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+    }
+    .ctrl.play-btn:hover { background: var(--accent); color: #faf3e7; }
+    .ctrl.play-btn svg { fill: currentColor; stroke: currentColor; }
+    .controls-meta {
+      gap: 16px;
+      font-family: var(--font-mono);
+    }
+    .meta-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+    .kb-hint { font-family: var(--font-mono); }
+    .kb-hint kbd { font-family: var(--font-mono); }
+
+    /* ───────── Panels & settings — editorial treatment ───────── */
+    .panel-header h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-style: italic;
+      font-size: 20px;
+      letter-spacing: -0.005em;
+    }
+    .toc-item { font-family: var(--font-body); font-size: 14px; }
+    .toc-item.current { color: var(--accent); font-style: italic; }
+
+    .setting-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .theme-btn[data-t="dark"]   { background: oklch(0.18 0.01 60); }
+    .theme-btn[data-t="light"]  { background: oklch(0.96 0.012 85); }
+    .theme-btn[data-t="sepia"]  { background: oklch(0.86 0.06 85); }
+
+    /* ───────── Summary view — editorial briefing ───────── */
+    .summary-hero {
+      text-align: center;
+      padding: 24px 8px 32px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 36px;
+    }
+    .summary-hero-period {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .summary-hero-idea {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 1.3;
+      letter-spacing: -0.005em;
+      color: var(--text);
+      padding: 0 6px;
+      position: relative;
+    }
+    .summary-hero-idea::before, .summary-hero-idea::after {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--accent);
+      margin: 0 auto 14px;
+    }
+    .summary-hero-idea::after { margin: 14px auto 0; }
+
+    .summary-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 10px;
+      margin: 28px 0 14px;
+    }
+    .summary-section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--rule);
+    }
+    .summary-card {
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid var(--rule);
+      border-radius: 0;
+      padding: 14px 0;
+      box-shadow: none;
+    }
+    .summary-card:last-child { border-bottom: 0; }
+    .summary-card-icon {
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--accent);
+    }
+    .summary-card-title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: -0.005em;
+    }
+    .summary-card-text {
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .summary-tag, .summary-figure {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--rule);
+      background: transparent;
+      border-radius: 2px;
+    }
+    .summary-figure-avatar {
+      font-family: var(--font-display);
+      font-style: italic;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .summary-generate-btn {
+      font-family: var(--font-mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 11px;
+      border: 1px solid var(--rule);
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .summary-generate-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .summary-nav-btn {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .summary-nav-btn:hover { color: var(--accent); }
+
+    /* Toast + tap feedback keep base look but warmer surface */
+    .toast { background: var(--text); color: var(--bg); font-family: var(--font-body); }
+    .tap-feedback { background: var(--text); color: var(--bg); }
+
+    /* Tutorial overlay — warmer */
+    .tutorial-card {
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-body);
+    }
+    .tutorial-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .tutorial-btn { font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; }
+
+    /* Progress bar fill gets the accent */
+    .progress-fill { background: var(--accent); }
+    .book-progress-fill { background: var(--accent); }
+
+    /* Mobile tweaks — tighten the reader on small screens */
+    @media (max-width: 768px) {
+      .lib-masthead h2 { font-size: 32px; }
+      .continue-hero h2 { font-size: 22px; padding-right: 56px; }
+      .continue-hero .play-pill { width: 42px; height: 42px; }
+      .ch-head h2 { font-size: 22px; }
+      .summary-hero-idea { font-size: 20px; }
+      body.reader-open:not(.summary-mode) .seg.active .sentence.current {
+        box-shadow: none !important;
+      }
+    }
   </style>
 </head>
 <body data-theme="dark">
@@ -1060,7 +1703,7 @@
   <!-- ===== LIBRARY VIEW ===== -->
   <div class="view active" id="libraryView">
     <div class="lib-header">
-      <h1>Library</h1>
+      <h1>Aloud</h1>
       <div class="header-actions">
         <button class="icon-btn" id="libSettingsBtn" title="Settings">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -1717,11 +2360,45 @@ service cloud.firestore {
     const reading = S.library.filter(b => progress[b.id] && (progress[b.id].chapter > 0 || progress[b.id].seg > 0));
     const other = S.library.filter(b => !reading.includes(b));
 
-    let html = '';
+    // Masthead — warm editorial header
+    const today = new Date();
+    const dateStr = today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
+    let html = `<div class="lib-masthead">
+      <div class="kicker">${esc(dateStr)}</div>
+      <h2>Your <em>Reading Room</em></h2>
+    </div>`;
+
+    // Continue-reading hero — pick the book with most progress
+    let hero = null;
     if (reading.length) {
+      hero = reading.slice().sort((a,b)=>{
+        const pa = progress[a.id], pb = progress[b.id];
+        return (pb.chapter*10000 + pb.seg) - (pa.chapter*10000 + pa.seg);
+      })[0];
+      html += continueHeroHTML(hero, progress);
+    }
+
+    // Stats strip — books / in-progress / % read
+    const totalBooks = S.library.length;
+    const inProgress = reading.length;
+    const totalSegs = S.library.reduce((s,b)=>s+(b.segments||0),0);
+    const readSegs = S.library.reduce((s,b)=>{
+      const p = progress[b.id]; if(!p) return s;
+      return s + computeGlobalSeg(b, p);
+    },0);
+    const pctRead = totalSegs ? Math.round((readSegs/totalSegs)*100) : 0;
+    html += `<div class="lib-stats">
+      <div class="stat"><div class="num">${totalBooks}</div><div class="lbl">Books</div></div>
+      <div class="stat"><div class="num">${inProgress}</div><div class="lbl">In Progress</div></div>
+      <div class="stat"><div class="num">${pctRead}<em>%</em></div><div class="lbl">Read</div></div>
+    </div>`;
+
+    // Continue Reading grid (excluding hero, which is already above)
+    const contRest = reading.filter(b => !hero || b.id !== hero.id);
+    if (contRest.length) {
       html += '<div class="lib-section-title">Continue Reading</div><div class="lib-grid">';
-      reading.forEach(b => html += bookCardHTML(b, progress));
+      contRest.forEach(b => html += bookCardHTML(b, progress));
       html += '</div>';
     }
 
@@ -1737,6 +2414,12 @@ service cloud.firestore {
     html += '</div>';
 
     body.innerHTML = html;
+
+    // Hero click → open the hero book
+    const heroEl = body.querySelector('.continue-hero');
+    if (heroEl) {
+      heroEl.addEventListener('click', () => openBook(heroEl.dataset.id));
+    }
 
     // Bind events
     body.querySelectorAll('.book-card').forEach(card => {
@@ -1791,7 +2474,37 @@ service cloud.firestore {
     </div>`;
   }
 
+  function continueHeroHTML(b, progress) {
+    const p = progress[b.id] || { chapter: 0, seg: 0 };
+    const totalSegs = b.segments || 0;
+    const currentSeg = computeGlobalSeg(b, p);
+    const pct = totalSegs > 0 ? Math.round((currentSeg / totalSegs) * 100) : 0;
+    // Best-effort excerpt: we only have it once the book is opened, so use subtitle/author
+    const excerpt = b.subtitle || 'Pick up where you left off — your place is saved.';
+    return `<div class="continue-hero" data-id="${b.id}">
+      <div class="hero-kicker"><span class="dot"></span>Continue reading</div>
+      <h2>${esc(b.title)}</h2>
+      <div class="hero-author">by ${esc(b.author)}</div>
+      <div class="hero-excerpt">${esc(excerpt)}</div>
+      <div class="hero-progress">
+        <span>${currentSeg} / ${totalSegs || '—'}</span>
+        <div class="bar"><div class="fill" style="width:${pct}%"></div></div>
+        <span>${pct}%</span>
+      </div>
+      <div class="play-pill"><svg viewBox="0 0 24 24"><path d="M7 4l14 8-14 8z"/></svg></div>
+    </div>`;
+  }
+
   function hashStr(s) { let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i); h|=0;} return h; }
+
+  function toRoman(n) {
+    if (!Number.isFinite(n) || n < 1) return String(n);
+    if (n > 3999) return String(n);
+    const map = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+    let out = '';
+    for (const [v,s] of map) { while (n >= v) { out += s; n -= v; } }
+    return out;
+  }
 
   function computeGlobalSeg(libraryEntry, progress) {
     // We need chapter info to compute global position
@@ -2326,9 +3039,21 @@ Rules for each section:
     S.cur = Math.min(S.cur, segs.length - 1);
 
     rc.innerHTML = '';
+
+    // Chapter flourish — editorial heading above the first segment
+    const chTitle = (S.book && S.book.chapters[S.chapter]?.title) || '';
+    if (chTitle) {
+      const chHead = document.createElement('div');
+      chHead.className = 'ch-head';
+      const romanNum = toRoman(S.chapter + 1);
+      chHead.innerHTML = `<div class="num"><span class="flourish"></span>Chapter ${romanNum}<span class="flourish"></span></div>
+        <h2>${esc(chTitle)}</h2>`;
+      rc.appendChild(chHead);
+    }
+
     segs.forEach((seg, i) => {
       const div = document.createElement('div');
-      div.className = 'seg';
+      div.className = 'seg' + (i === 0 ? ' first-seg' : '');
       const bmKey = S.chapter + ':' + i;
       if (S.bookmarks.has(bmKey)) div.classList.add('bookmarked');
       div.dataset.i = i;
@@ -2448,13 +3173,35 @@ Rules for each section:
     if (si >= sentences.length) { advanceAfterSentence(sentences, si); return; }
     S.curSentence = si;
     const active = document.querySelector('.seg.active');
-    if (active) active.querySelectorAll('.sentence').forEach((el,i) => el.classList.toggle('current', i===si));
+    if (active) {
+      const estMs = estimateSentenceMs(sentences[si]);
+      active.querySelectorAll('.sentence').forEach((el, i) => {
+        const isCurrent = i === si;
+        if (isCurrent) {
+          // Set --sent-ms BEFORE adding the class so the animation uses it.
+          el.style.setProperty('--sent-ms', estMs + 'ms');
+          // Force a fresh animation run in case this element was already current.
+          el.classList.remove('current');
+          void el.offsetHeight;
+          el.classList.add('current');
+        } else {
+          el.classList.remove('current');
+        }
+      });
+    }
 
     const u = new SpeechSynthesisUtterance(sentences[si]);
     u.rate = S.speed;
     u.onend = () => { if(S.playing) advanceAfterSentence(sentences, si); };
     u.onerror = e => { if(e.error!=='canceled'&&S.playing) advanceAfterSentence(sentences, si); };
     synth.speak(u);
+  }
+
+  // Estimate how long a sentence should take at current speed.
+  // Used to drive the ink-highlight animation duration (--sent-ms).
+  function estimateSentenceMs(text) {
+    const base = Math.max(1200, Math.min(6000, (text || '').length * 55));
+    return Math.round(base / Math.max(0.5, S.speed || 1));
   }
 
   // Full-segment TTS approach for OpenAI
@@ -2546,12 +3293,17 @@ Rules for each section:
     clearInterval(ttsHighlightTimer);
 
     // Build cumulative character offsets for timing estimation
-    const totalChars = sentences.reduce((a, s) => a + s.length, 0);
+    const totalChars = sentences.reduce((a, s) => a + s.length, 0) || 1;
     const boundaries = [];
     let cumChars = 0;
     sentences.forEach(s => {
       boundaries.push(cumChars / totalChars);
       cumChars += s.length;
+    });
+    // Per-sentence estimated duration (seconds) so the ink animation matches.
+    const perSentenceMs = sentences.map((s, i) => {
+      const next = (i + 1 < boundaries.length) ? boundaries[i + 1] : 1;
+      return Math.round((next - boundaries[i]) * (duration || 0) * 1000);
     });
 
     ttsHighlightTimer = setInterval(() => {
@@ -2566,7 +3318,20 @@ Rules for each section:
       if (currentSi !== S.curSentence) {
         S.curSentence = currentSi;
         const active = document.querySelector('.seg.active');
-        if (active) active.querySelectorAll('.sentence').forEach((el, i) => el.classList.toggle('current', i === currentSi));
+        if (active) {
+          const ms = perSentenceMs[currentSi] || 2600;
+          active.querySelectorAll('.sentence').forEach((el, i) => {
+            const isCurrent = i === currentSi;
+            if (isCurrent) {
+              el.style.setProperty('--sent-ms', ms + 'ms');
+              el.classList.remove('current');
+              void el.offsetHeight;
+              el.classList.add('current');
+            } else {
+              el.classList.remove('current');
+            }
+          });
+        }
       }
     }, 150);
   }
