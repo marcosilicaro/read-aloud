@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aloud — The Reading Room</title>
+<link rel="stylesheet" href="styles.css?v=3">
+<style>
+  /* Device bezel — a warm iPhone feel that lets the paper-page breathe */
+  .device {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    border-radius: 52px;
+    background: #1a1a1e;
+    padding: 12px;
+    box-shadow:
+      0 50px 100px rgba(0,0,0,0.55),
+      0 0 0 1px rgba(255,255,255,0.06),
+      inset 0 0 0 2px rgba(255,255,255,0.04);
+  }
+  .device-screen {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+    background: var(--bg, #f6f1e4);
+  }
+  /* Dynamic island */
+  .island {
+    position: absolute;
+    top: 12px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 34px; border-radius: 20px;
+    background: #000;
+    z-index: 100;
+    pointer-events: none;
+  }
+  /* Status bar */
+  .status {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    padding: 18px 30px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 80;
+    pointer-events: none;
+    font-family: -apple-system, 'SF Pro Text', system-ui;
+    font-weight: 590; font-size: 15px;
+    color: var(--ink);
+  }
+  .status svg { fill: currentColor; }
+  /* Home indicator */
+  .home-ind {
+    position: absolute;
+    bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 3px;
+    background: var(--ink);
+    opacity: 0.22;
+    z-index: 90;
+    pointer-events: none;
+  }
+
+  /* View-switcher tabs — a subtle shelf label beneath the device */
+  .scene-caption {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: -68px;
+    display: flex; gap: 8px;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .scene-caption button {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #a8a299;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit; font-size: 11px;
+    letter-spacing: inherit;
+    text-transform: uppercase;
+    transition: all 0.15s ease;
+  }
+  .scene-caption button:hover { color: #e9e6de; border-color: rgba(255,255,255,0.18); }
+  .scene-caption button.on {
+    background: oklch(0.52 0.14 40);
+    border-color: oklch(0.52 0.14 40);
+    color: #fff1e1;
+  }
+
+  .device-stage {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 20px;
+  }
+
+  /* Signature "Aloud" branding caption above device */
+  .brand-caption {
+    position: absolute;
+    top: -56px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: #7a7365;
+  }
+  .brand-caption .mark {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: #d9c8a8;
+    letter-spacing: -0.01em;
+  }
+  .brand-caption .mark em { font-style: normal; color: oklch(0.72 0.13 50); }
+  .brand-caption .sub {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #6a6357;
+  }
+</style>
+</head>
+<body>
+
+<div class="device-stage">
+  <div class="device">
+    <div class="brand-caption">
+      <div class="mark">Aloud <em>·</em> The Reading Room</div>
+      <div class="sub">A Redesign Study</div>
+    </div>
+    <div class="device-screen" id="screen">
+      <!-- React mounts here -->
+      <div id="root" style="position:absolute; inset:0;"></div>
+      <!-- iOS chrome layered on top -->
+      <div class="island"></div>
+      <div class="status">
+        <span>9:41</span>
+        <span style="display:flex; gap:6px; align-items:center;">
+          <svg width="18" height="11" viewBox="0 0 18 11"><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="0.6"/><rect x="9" y="2" width="3" height="9" rx="0.6"/><rect x="13.5" y="0" width="3" height="11" rx="0.6"/></svg>
+          <svg width="24" height="11" viewBox="0 0 24 11" style="opacity:0.9"><rect x="0.5" y="0.5" width="20" height="10" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="17" height="7" rx="1.5"/><rect x="21.5" y="3.5" width="1.5" height="4" rx="0.5" opacity="0.5"/></svg>
+        </span>
+      </div>
+      <div class="home-ind"></div>
+    </div>
+  </div>
+
+  <div class="scene-caption">
+    <button data-view="library">Library</button>
+    <button data-view="reader" class="on">Reader</button>
+    <button data-view="summary">Summary</button>
+  </div>
+</div>
+
+<!-- Tweaks panel -->
+<div class="tweaks" id="tweaks">
+  <h4>Tweaks</h4>
+  <div class="row">
+    <label>Theme</label>
+    <div class="seg-group" id="tw-theme">
+      <button data-v="light" class="on">Paper</button>
+      <button data-v="dark">Lamp</button>
+    </div>
+  </div>
+  <div class="row">
+    <label>Font size</label>
+    <input type="range" id="tw-size" min="15" max="24" step="1" value="19">
+  </div>
+  <div class="row">
+    <label>Playback demo</label>
+    <div class="seg-group" id="tw-play">
+      <button data-v="play">Play</button>
+      <button data-v="pause" class="on">Pause</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings persisted -->
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "fontSize": 19,
+  "startView": "reader"
+}/*EDITMODE-END*/;
+</script>
+
+<!-- React + Babel -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="data.js"></script>
+<script type="text/babel" src="app.jsx" data-presets="react"></script>
+<script type="text/babel" data-presets="react">
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<script>
+  // Scene caption buttons
+  document.querySelectorAll('.scene-caption button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scene-caption button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      if (window.__setView) window.__setView(btn.dataset.view);
+    });
+  });
+
+  // Tweaks panel — edit mode protocol
+  const tweaks = document.getElementById('tweaks');
+  let tweakState = { ...TWEAK_DEFAULTS };
+
+  function applyTweaks() {
+    if (window.__setTheme) window.__setTheme(tweakState.theme);
+    if (window.__setFontSize) window.__setFontSize(tweakState.fontSize);
+  }
+  // Apply on load (wait a beat for React to mount)
+  setTimeout(applyTweaks, 200);
+
+  window.addEventListener('message', (e) => {
+    if (!e.data || typeof e.data !== 'object') return;
+    if (e.data.type === '__activate_edit_mode') tweaks.classList.add('show');
+    if (e.data.type === '__deactivate_edit_mode') tweaks.classList.remove('show');
+  });
+  window.parent.postMessage({type: '__edit_mode_available'}, '*');
+
+  function postEdit(edits) {
+    Object.assign(tweakState, edits);
+    applyTweaks();
+    window.parent.postMessage({type: '__edit_mode_set_keys', edits}, '*');
+  }
+
+  // theme toggle
+  document.querySelectorAll('#tw-theme button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#tw-theme button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      postEdit({theme: b.dataset.v});
+    });
+  });
+  // size slider
+  document.getElementById('tw-size').addEventListener('input', (e) => {
+    postEdit({fontSize: parseInt(e.target.value, 10)});
+  });
+  // play/pause demo
+  document.querySelectorAll('#tw-play button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#tw-play button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      // toggle by simulating click on the play button in the pill
+      const play = document.querySelector('.pill .play');
+      if (play) {
+        const isPaused = play.getAttribute('aria-label') === 'play';
+        if ((b.dataset.v === 'play' && isPaused) || (b.dataset.v === 'pause' && !isPaused)) {
+          play.click();
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
